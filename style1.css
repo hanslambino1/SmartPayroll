@@ -18,6 +18,9 @@ body {
     color: white;
     position: relative;
     overflow-x: hidden; 
+    /* Transition sa pages */
+    opacity: 0;
+    animation: fadeIn 1.0s ease-in-out forwards;  
 }
 
 
@@ -315,4 +318,5 @@ body {
     color: #ffffff;
     text-decoration: underline;
 }
+
 
