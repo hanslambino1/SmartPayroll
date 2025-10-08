@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Payroll</title>
+  <link rel="stylesheet" href="payroll.css">
+  <script src="payroll.js"></script>
+</head>
+<body>
+  <div class="container">
+    <!-- Sidebar -->
+  <aside class="sidebar">
+  <div class="logo">
+    <img src="SPlogo.png" alt="Company Logo">
+  </div>
+  <ul class="nav">
+    <li><a href="dashboard.html"><img src="Analytics.png" alt="Dashboard" class="nav-icon"> Dashboard</a></li>
+    <li><a href="Employee.html"><img src="People.png" alt="Employees" class="nav-icon"> Employees</a></li>
+    <li><a href="DTR.html"><img src="Schedule.png" alt="Daily Time Record" class="nav-icon"> Daily Time Record</a></li>
+    <li class="active"><a href="payroll.html"><img src="Payroll.png" alt="Payroll" class="nav-icon"> Payroll</a></li>
+    <li><a href="Reports.html"><img src="Graph Report.png" alt="Reports" class="nav-icon"> Reports</a></li>
+    <li><a href="settings.html"><img src="Settings.png" alt="Settings" class="nav-icon"> Settings</a></li>
+  </ul>
+</aside>
+
+
+    <!-- Main Content -->
+    <main class="content">
+      <h1>Payroll</h1>
+
+      <div class="controls">
+        <select>
+          <option>Weekly</option>
+          <option>Bi-Weekly</option>
+          <option>Monthly</option>
+        </select>
+        <button class="compute" id="computeBtn">Compute</button>
+      </div>
+
+      <div class="table-container">
+        <table id="payrollTable">
+          <thead>
+            <tr>
+              <th>Name</th>
+              <th>Salary</th>
+              <th>Deduction</th>
+              <th>Net Salary</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td contenteditable="true">Juan Dela Cruz</td>
+              <td><span class="peso">₱</span><span class="amount" contenteditable="true">13500.00</span></td>
+              <td><span class="peso">₱</span><span class="amount" contenteditable="true">1200.00</span></td>
+              <td><span class="peso">₱</span><span class="amount" contenteditable="true">12300.00</span></td>
+            </tr>
+            <tr>
+              <td contenteditable="true">Juana Cruz</td>
+              <td><span class="peso">₱</span><span class="amount" contenteditable="true">15750.00</span></td>
+              <td><span class="peso">₱</span><span class="amount" contenteditable="true">1500.00</span></td>
+              <td><span class="peso">₱</span><span class="amount" contenteditable="true">14250.00</span></td>
+            </tr>
+            <tr>
+              <td contenteditable="true">Jhon De Guzman</td>
+              <td><span class="peso">₱</span><span class="amount" contenteditable="true">14850.00</span></td>
+              <td><span class="peso">₱</span><span class="amount" contenteditable="true">1300.00</span></td>
+              <td><span class="peso">₱</span><span class="amount" contenteditable="true">13550.00</span></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </main>
+  </div>
+</body>
+</html>

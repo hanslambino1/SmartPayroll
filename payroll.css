@@ -1,0 +1,162 @@
+/* General Styles */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: "Poppins", sans-serif;
+}
+
+body {
+  background: #f0f0f0;
+  color: #333;
+}
+
+/* Layout */
+.container {
+  display: flex;
+  height: 100vh;
+}
+
+/* Sidebar */
+/* Sidebar */
+.sidebar {
+  width: 220px;
+  background: #0D2A4B;
+  color: white;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  padding-top: 20px;
+  background-image: radial-gradient(circle at center, rgba(255, 255, 255, 0.08) 1px, transparent 2px);
+  background-size: 20px 20px;
+}
+
+.logo {
+  width: 100%;
+  text-align: center;
+  margin-bottom: 20px;
+}
+
+.logo img {
+  width: 100px;
+  height: 100px;
+  object-fit: contain;
+}
+
+/* Navigation */
+.nav {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  width: 100%;
+}
+
+.nav li {
+  width: 100%;
+}
+
+.nav li a {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  padding: 20px 20px;
+  text-decoration: none;
+  color: white;
+  transition: background 0.3s;
+}
+
+.nav li a span {
+  flex: 1;
+}
+
+.nav li.active a {
+  background: #326FC5;
+  border-left: 4px solid #1abc9c;
+}
+
+.nav li a:hover {
+  background: #1e3a8a;
+}
+
+.nav-icon {
+  width: 20px;
+  height: 20px;
+  margin-right: 12px;
+  object-fit: contain;
+}
+
+
+/* Content */
+.content {
+  flex: 1;
+  padding: 30px;
+  background: #e5e5e5;
+}
+
+.content h1 {
+  font-size: 28px;
+  margin-bottom: 20px;
+  font-weight: bold;
+}
+
+/* Controls */
+.controls {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 15px;
+}
+
+.controls select {
+  padding: 8px 12px;
+  font-size: 14px;
+  border-radius: 6px;
+  border: 1px solid #ccc;
+}
+
+.controls .compute {
+  background: #1e3aaf;
+  color: white;
+  padding: 8px 18px;
+  border: none;
+  border-radius: 20px;
+  font-size: 14px;
+  cursor: pointer;
+}
+
+.controls .compute:hover {
+  background: #142a80;
+}
+
+/* Table */
+.table-container {
+  background: white;
+  border-radius: 10px;
+  overflow: hidden;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+thead {
+  background: #2529c5;
+  color: white;
+  font-size: 15px;
+}
+
+thead th {
+  padding: 12px;
+  text-align: left;
+}
+
+tbody td {
+  padding: 12px;
+  border-bottom: 1px solid #ddd;
+}
+
+tbody tr:last-child td {
+  border-bottom: none;
+}
