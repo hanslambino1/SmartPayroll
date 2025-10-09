@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Settings</title>
+  <link rel="stylesheet" href="settings.css">
+</head>
+<body>
+  <div class="container">
+    <!-- Sidebar -->
+    <aside class="sidebar">
+      <div class="logo">
+        <img src="SPlogo.png" alt="Logo">
+      </div>
+      <ul class="nav">
+        <li><a href="dashboard.html"><img src="Analytics.png" alt="Dashboard" class="nav-icon"><span>Dashboard</span></a></li>
+        <li><a href="employee.html"><img src="People.png" alt="Employees" class="nav-icon"><span>Employees</span></a></li>
+        <li><a href="DTR.html"><img src="Schedule.png" alt="Daily Time Record" class="nav-icon"><span>Daily Time Record</span></a></li>
+        <li><a href="payroll.html"><img src="Payroll.png" alt="Payroll" class="nav-icon"><span>Payroll</span></a></li>
+        <li><a href="reports.html"><img src="Graph Report.png" alt="Reports" class="nav-icon"><span>Reports</span></a></li>
+        <li class="active"><a href="settings.html"><img src="Settings.png" alt="Settings" class="nav-icon"><span>Settings</span></a></li>
+      </ul>
+       <div class="logout-container">
+      <button id="logoutBtn" class="logout-btn">
+      <img src="logout.png" class="icon"/>Logout
+    </button>
+    </div>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="main">
+      <h1>Settings</h1>
+      <section class="account-settings">
+        <h2>Account</h2>
+        <form>
+          <label for="name">Name</label>
+          <input type="text" id="name" placeholder="Enter your name">
+
+          <label for="email">Email</label>
+          <input type="email" id="email" placeholder="Enter your email">
+
+          <div class="password-row">
+            <input type="password" id="password" placeholder="Password">
+            <button type="button" class="btn-secondary">Change Password</button>
+          </div>
+
+          <button type="submit" class="btn-primary">Save Changes</button>
+        </form>
+      </section>
+    </main>
+  </div>
+
+  <script>
+document.addEventListener("DOMContentLoaded", () => {
+  const logoutBtn = document.getElementById("logoutBtn");
+  if (logoutBtn) {
+    logoutBtn.addEventListener("click", () => {
+      if (confirm("Are you sure you want to log out?")) {
+        fetch("/logout")
+          .then(() => window.location.href = "/LOGIN.html")
+          .catch(err => alert("Error logging out. Please try again."));
+      }
+    });
+  }
+});
+
+</script>
+</body>
+</html>
