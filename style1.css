@@ -8,8 +8,7 @@
 body {
     height: 100vh;
     background-color: #0f172a; 
-    background-image: 
-        radial-gradient(circle at center, rgba(255, 255, 255, 0.08) 1px, transparent 2px);
+    background-image: radial-gradient(circle at center, rgba(255, 255, 255, 0.08) 1px, transparent 2px);
     background-size: 20px 20px;
     display: flex;
     flex-direction: column;
@@ -18,9 +17,8 @@ body {
     color: white;
     position: relative;
     overflow-x: hidden; 
-    /* Transition sa pages */
-    opacity: 0;
-    animation: fadeIn 1.0s ease-in-out forwards;  
+    opacity: 0; 
+    animation: fadeIn 1.0s ease-in-out forwards; 
 }
 
 
@@ -201,9 +199,7 @@ body {
   text-decoration: underline;
 }
 
-
-/* Responsive Design para sa different sizes*/
-
+/* Responsive Design */
 /* Tablets (portrait/landscape) */
 @media (max-width: 1024px) {
   .logo img {
@@ -317,6 +313,56 @@ body {
 .footer a:hover {
     color: #ffffff;
     text-decoration: underline;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+/* Modal styles */
+/* Modal background */
+.modal {
+  display: none; 
+  position: fixed;
+  z-index: 1000;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  overflow: auto;
+  background: rgba(0, 0, 0, 0.5); 
+}
+
+/* Modal content box */
+.modal-content {
+  background: #1e3261;
+  margin: 10% auto;
+  padding: 20px;
+  border-radius: 10px;
+  width: 60%;
+  max-width: 600px;
+  box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+  animation: fadeIn 0.3s ease-in-out;
+}
+
+.modal-content h2 {
+  text-align: center;
+  margin-bottom: 30px;
+}
+
+/* Close button */
+.close {
+  float: right;
+  font-size: 24px;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+/* Animation */
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(-20px); }
+  to { opacity: 1; transform: translateY(0); }
 }
 
 
