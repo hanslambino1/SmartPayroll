@@ -1,0 +1,337 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>SmartPayroll | Resigned</title>
+  <link rel="icon" href="SPlogo.png" />
+  <link rel="stylesheet" href="employees.css" />
+  <script src="script.js" defer></script>
+</head>
+<body>
+  <div class="container">
+    <aside class="sidebar">
+      <div class="sidebar-header"><img src="SPlogo.png" class="logo" /></div>
+      <ul class="menu">
+        <li><a href="DASHBOARD.html"><img src="bar-graph.png" class="icon"> Dashboard</a></li>
+        <li class="active"><a href="EMPLOYEES.html"><img src="group.png" class="icon"> Employees</a></li>
+        <li><a href="DTR.html"><img src="timetable.png" class="icon"> Daily Time Record</a></li>
+        <li><a href="PAYROLL.html"><img src="user.png" class="icon"> Payroll</a></li>
+        <li><a href="REPORTS.html"><img src="business-report.png" class="icon"> Reports</a></li>
+        <li><a href="SETTINGS.html"><img src="gear.png" class="icon"> Settings</a></li>
+      </ul>
+      <div class="logout-container">
+        <button id="logoutBtn" class="logout-btn"><img src="logout.png" class="icon" />Logout</button>
+      </div>
+    </aside>
+
+    <main class="main show">
+      <h1>Resigned Employees</h1>
+      <!-- Search Bar -->
+      <div class="search-bar">
+        <input type="text" placeholder="Last Name | First Name | Middle Name" />
+        <button class="search-btn">🔍</button>
+      </div>
+
+      <!-- Resigned Label -->
+      <div class="active-label" id="activedBtn">Active Employees</div>
+
+      <!-- Employees Table -->
+      <div class="table-container">
+        <table id="employeesTable">
+          <thead>
+            <tr>
+              <th>ID</th>
+              <th>Name</th>
+              <th>Dept</th>
+              <th>Position</th>
+              <th>Status</th>
+              <th>Date Hired</th>
+              <th>Action</th>
+            </tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+      </div>
+
+  <!-- Edit Employee Modal -->
+<div id="editModal" class="modal hidden">
+  <div class="modal-content">
+    <div class="modal-header">
+      <h2>Edit Employee</h2>
+      <button id="closeModal" class="close">&times;</button>
+    </div>
+
+    <form id="editEmployeeForm" class="modal-body">
+      <input type="hidden" name="id" />
+
+      <div class="form-group">
+        <label>Employee Name</label>
+        <input type="text" name="name" placeholder="Employee Name" required />
+      </div>
+
+      <div class="form-group">
+        <label>Department</label>
+        <select name="dept" required>
+          <option>Human Resources</option>
+          <option>Finance and Accounting</option>
+          <option>Information Technology (IT)</option>
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label>Position</label>
+        <select name="position" required>
+          <option>Financial Officer</option>
+          <option>Maintenance Personnel</option>
+          <option>Payroll Officer</option>
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label>Status</label>
+        <select name="status" required>
+          <option>Resigned</option>
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label>Date Hired</label>
+        <input type="date" name="date_hired" />
+      </div>
+
+      <div class="form-group">
+        <label>Salary</label>
+        <input type="number" step="0.01" name="salary" placeholder="Salary" />
+      </div>
+
+      <div class="form-group">
+        <label>Emergency Contact Name</label>
+        <input type="text" name="emergency_contact_name" placeholder="Emergency Contact Name" />
+      </div>
+
+      <div class="form-group">
+        <label>Emergency Contact Number</label>
+        <input type="text" name="emergency_contact_no" placeholder="Emergency Contact Number" />
+      </div>
+
+      <div class="form-group">
+        <label>Employee Contact Number</label>
+        <input type="text" name="contact_no" placeholder="Employee Contact Number" />
+      </div>
+
+      <div class="form-group">
+        <label>Address</label>
+        <input type="text" name="address" placeholder="Address" />
+      </div>
+
+      <div class="form-group">
+        <label>SSS Number</label>
+        <input type="text" name="sss_no" placeholder="SSS Number" />
+      </div>
+
+      <div class="form-group">
+        <label>PhilHealth Number</label>
+        <input type="text" name="philhealth_no" placeholder="PhilHealth Number" />
+      </div>
+
+      <div class="form-group">
+        <label>Pag-ibig Number</label>
+        <input type="text" name="pagibig_no" placeholder="Pag-ibig Number" />
+      </div>
+
+      <div class="form-group">
+        <label>ATM Number</label>
+        <input type="text" name="atm_no" placeholder="ATM Number" />
+      </div>
+
+      <div class="form-actions">
+        <button type="submit" class="save-btn">Save Changes</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+  <script>
+    // Load Resigned Employees
+document.addEventListener("DOMContentLoaded", loadResignedEmployees);
+
+async function loadResignedEmployees() {
+  try {
+    const res = await fetch("/api/resigned");
+    const employees = await res.json();
+
+    const tbody = document.querySelector("#employeesTable tbody");
+    tbody.innerHTML = "";
+
+    if (employees.length === 0) {
+      tbody.innerHTML = `<tr><td colspan="7" style="text-align:center;">No resigned employees found</td></tr>`;
+      return;
+    }
+
+    employees.forEach(emp => {
+      const tr = document.createElement("tr");
+      tr.innerHTML = `
+        <td>${emp.id}</td>
+        <td>${emp.name}</td>
+        <td>${emp.dept}</td>
+        <td>${emp.position}</td>
+        <td>${emp.status}</td>
+        <td>${emp.date_hired ? emp.date_hired.split("T")[0] : ""}</td>
+        <td>
+          <button class="edit-btn" data-id="${emp.id}">Edit</button>
+          <button class="reactivate-btn" data-id="${emp.id}">Reactivate</button>
+        </td>
+      `;
+      tbody.appendChild(tr);
+    });
+  } catch (err) {
+    console.error("❌ Error loading resigned employees:", err);
+  }
+}
+
+// Handle Reactivate Button
+document.addEventListener("click", async (e) => {
+  if (e.target.classList.contains("reactivate-btn")) {
+    const id = e.target.dataset.id;
+    if (!confirm("Do you want to reactivate this employee?")) return;
+
+    try {
+      const res = await fetch(`/api/resigned/reactivate/${id}`, {
+        method: "POST"
+      });
+      const result = await res.json();
+
+      if (res.ok) {
+        alert("✅ Employee reactivated successfully!");
+        loadResignedEmployees();
+      } else {
+        alert("❌ " + result.error);
+      }
+    } catch (err) {
+      console.error("Error reactivating employee:", err);
+      alert("❌ Failed to reactivate employee");
+    }
+  }
+});
+
+// Back to active employees page
+document.getElementById("activedBtn").addEventListener("click", () => {
+  window.location.href = "EMPLOYEES.html";
+});
+
+// Search Employees
+document.querySelector(".search-btn").addEventListener("click", searchEmployees);
+document.querySelector(".search-bar input").addEventListener("keyup", (e) => {
+  if (e.key === "Enter") searchEmployees();
+});
+
+function searchEmployees() {
+  const query = document.querySelector(".search-bar input").value.toLowerCase().trim();
+  const rows = document.querySelectorAll("#employeesTable tbody tr");
+
+  rows.forEach(row => {
+    const id = row.children[0].textContent.toLowerCase();
+    const name = row.children[1].textContent.toLowerCase();
+    const dept = row.children[2].textContent.toLowerCase();
+    const position = row.children[3].textContent.toLowerCase();
+    const status = row.children[4].textContent.toLowerCase();
+
+    // Show employee if any field matches the query
+    if (
+      id.includes(query) ||
+      name.includes(query) ||
+      dept.includes(query) ||
+      position.includes(query) ||
+      status.includes(query)
+    ) {
+      row.style.display = "";
+    } else {
+      row.style.display = "none";
+    }
+  });
+}
+
+
+// Handle Edit button click for Resigned Employees
+document.addEventListener("click", async (e) => {
+  if (e.target.classList.contains("edit-btn")) {
+    const id = e.target.dataset.id;
+
+    try {
+      const res = await fetch(`/api/resigned/${id}`);
+      const emp = await res.json();
+
+      if (res.ok) {
+        const form = document.getElementById("editEmployeeForm");
+
+        // Fill modal with employee data
+        for (const key in emp) {
+          if (form[key]) {
+            if (key === "date_hired" || key === "date_resigned") {
+              form[key].value = emp[key]
+                ? emp[key].split("T")[0]
+                : "";
+            } else {
+              form[key].value = emp[key] || "";
+            }
+          }
+        }
+
+        document.getElementById("editModal").classList.remove("hidden");
+      } else {
+        alert("Error loading employee details");
+      }
+    } catch (err) {
+      console.error(err);
+      alert("Error loading employee details");
+    }
+  }
+});
+
+// Close modal
+document.getElementById("closeModal").addEventListener("click", () => {
+  document.getElementById("editModal").classList.add("hidden");
+});
+document.getElementById("cancelEdit").addEventListener("click", () => {
+  document.getElementById("editModal").classList.add("hidden");
+});
+
+
+// Save edited resigned employee
+document.getElementById("editEmployeeForm").addEventListener("submit", async (e) => {
+  e.preventDefault();
+  const form = e.target;
+  const id = form.id.value;
+
+  const data = Object.fromEntries(new FormData(form).entries());
+
+  try {
+    const res = await fetch(`/api/resigned/update/${id}`, {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(data),
+    });
+
+    const result = await res.json();
+
+    if (res.ok) {
+      alert("✅ Resigned employee updated successfully!");
+      document.getElementById("editModal").classList.add("hidden");
+      loadResignedEmployees(); 
+    } else {
+      alert("❌ Error: " + result.error);
+    }
+  } catch (err) {
+    console.error("Error saving changes:", err);
+    alert("❌ Error saving changes");
+  }
+});
+
+// Back to active employees page    
+  document.getElementById("activedBtn").addEventListener("click", () => {
+    window.location.href = "EMPLOYEES.html"; 
+  });
+</script>
+</body>
+</html>

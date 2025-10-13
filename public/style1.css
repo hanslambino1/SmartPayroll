@@ -1,0 +1,367 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+body {
+    height: 100vh;
+    background-color: #0f172a; 
+    background-image: radial-gradient(circle at center, rgba(255, 255, 255, 0.08) 1px, transparent 2px);
+    background-size: 20px 20px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-start;
+    color: white;
+    position: relative;
+    overflow-x: hidden; 
+    opacity: 0; 
+    animation: fadeIn 1.0s ease-in-out forwards; 
+}
+
+
+/* Header */
+.header {
+  width: 100%;
+  padding: 20px 50px;
+  position: absolute;
+  top: 0;
+  left: 0;
+  display: flex;
+  justify-content: right;
+  align-items: center;
+}
+
+/* Logo */
+.logo {
+  position: absolute;
+  left: 50px;
+  display: flex;
+  flex-direction: row; 
+  align-items: center; 
+  text-align: left;    
+  gap: 10px;           
+}
+
+
+.logo img {
+  width: 150px;
+  margin-top: 100px;
+}
+
+.logo h2 {
+  font-size: 30px;
+  color: #fff;
+  margin-top: 100px;
+}
+
+.logo h2 .smart {
+  color: #ffffff; 
+}
+
+.logo h2 .payroll {
+  color: #38bdf8; 
+}
+
+/* Navigation */
+.nav {
+  display: flex;
+  gap: 25px;
+  margin-top: 20px;
+}
+
+.nav a {
+  font-size: 30px;
+  color: #ffffff;
+  text-decoration: none;
+  transition: color 0.6s ease, transform 0.6s ease;
+}
+
+.nav a:hover {
+  color: #ffffff;
+  transform: scale(1.1);
+}
+
+/* Login Box */
+.login-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex: 1;
+  width: 100%;
+  margin-top: 200px;
+}
+
+.login-box {
+  background: rgba(0, 0, 0, 0);
+  padding: 35px;
+  border-radius: 12px;
+  text-align: center;
+  width: 100%;
+  max-width: 600px;
+}
+.login-box h1 {
+  margin-bottom: 25px;
+  font-size: 40px;
+  font-weight: bold;
+}
+
+/* Input Group */
+.input-group {
+  display: flex;
+  align-items: center;
+  background: rgba(172, 167, 167, 0.308);
+  border-radius: 8px;
+  margin-bottom: 30px;
+  padding: 20px;
+  transition: all 0.3s ease;
+  box-shadow: 0 7px 9px rgba(0, 0, 0, 0.329);
+}
+
+.input-group:hover {
+  transform: scale(1.02);
+}
+
+.input-group:focus-within {
+  border: 2px solid #38bdf8;
+  background: rgba(184, 179, 179, 0);
+}
+
+/* Input itself */
+.input-group input {
+  flex: 1;
+  background: none;
+  border: none;
+  outline: none;
+  font-size: 16px;
+  color: #fff;
+}
+
+/* Placeholder */
+.input-group input::placeholder {
+  color: #ffffff;
+}
+
+.input-group:focus-within{
+  border: 2px solid #38bdf8;
+}
+
+/* Button */
+.btn {
+  width: 100%;
+  padding: 12px;
+  border: none;
+  border-radius: 8px;
+  background: #1e3a8a;
+  color: white;
+  font-size: 18px;
+  cursor: pointer;
+  transition: background 0.3s ease, transform 0.2s;
+  position: relative;
+  overflow: hidden;
+  margin-top: 30px;
+}
+.btn:hover {
+  background: #2563eb;
+  transform: scale(1.02);
+}
+.btn:active {
+  transform: scale(0.98);
+}
+
+/* Ripple animation */
+.ripple {
+  position: absolute;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.6);
+  transform: scale(0);
+  animation: ripple 0.6s linear;
+  pointer-events: none;
+}
+@keyframes ripple {
+  to {
+    transform: scale(4);
+    opacity: 0;
+  }
+}
+
+/* Forgot Password */
+.forgot {
+  display: block;
+  margin-top: 12px;
+  font-size: 14px;
+  color: #38bdf8;
+  text-decoration: none;
+}
+.forgot:hover {
+  text-decoration: underline;
+}
+
+/* Responsive Design */
+/* Tablets (portrait/landscape) */
+@media (max-width: 1024px) {
+  .logo img {
+    width: 120px;
+    margin-top: 120px;
+  }
+  .logo h2 {
+    font-size: 24px;
+  }
+  .nav {
+    gap: 100px;
+    margin-top: 80px;
+  }
+  .nav a {
+    font-size: 24px;
+  }
+}
+
+/* Mobile & Small Tablets */
+@media (max-width: 768px) {
+  .logo {
+    position: relative;
+    margin: 20px auto;
+    left: 0;
+  }
+  .logo img {
+    width: 100px;
+    margin-top: 20px;
+  }
+  .logo h2 {
+    font-size: 20px;
+  }
+  .nav {
+    gap: 40px;
+    margin-top: 40px;
+  }
+  .nav a {
+    font-size: 18px;
+  }
+  .login-box {
+    max-width: 300px;
+    padding: 20px;
+  }
+}
+
+/* Small Phones */
+@media (max-width: 480px) {
+  .nav {
+    flex-direction: column;
+    gap: 15px;
+    margin-top: 20px;
+  }
+  .nav a {
+    font-size: 16px;
+  }
+  .login-box {
+    width: 90%;
+  }
+}
+
+/* About Page Container */
+.about-container {
+  text-align: center;
+  margin-top: 285px;
+  margin-bottom: 118px;
+  padding: 20px;
+  color: #fff;
+  max-width: 800px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.about-container h1 {
+  font-size: 50px;
+  font-weight: bold;  
+  margin-bottom: 20px;
+}
+
+.about-container p {
+  font-size: 23px;
+  line-height: 1.8;
+  text-align: center;
+  white-space: pre-line;
+  font-family: Poppins, sans-serif;
+}
+
+.nav a.active {
+  font-weight: bold;
+  border-bottom: 2px solid white;
+}   
+
+/* Footer */
+.footer {
+    width: 100%;
+    padding: 15px 0;
+    text-align: center;
+    font-size: 14px;
+    color: rgba(255, 255, 255, 0.7); 
+    background: rgba(0, 0, 0, 0.3); 
+    z-index: 10; 
+    margin-top: auto; 
+    margin-bottom: auto;
+}
+
+.footer a {
+    color: #38bdf8;
+    text-decoration: none;
+    transition: color 0.3s ease;
+}
+
+.footer a:hover {
+    color: #ffffff;
+    text-decoration: underline;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+/* Modal background */
+.modal {
+  display: none; 
+  position: fixed;
+  z-index: 1000;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  overflow: auto;
+  background: rgba(0, 0, 0, 0.5); 
+}
+
+/* Modal content box */
+.modal-content {
+  background: #1e3261;
+  margin: 10% auto;
+  padding: 20px;
+  border-radius: 10px;
+  width: 60%;
+  max-width: 600px;
+  box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+  animation: fadeIn 0.3s ease-in-out;
+}
+
+.modal-content h2 {
+  text-align: center;
+  margin-bottom: 30px;
+}
+
+/* Close button */
+.close {
+  float: right;
+  font-size: 24px;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+/* Animation */
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(-20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+

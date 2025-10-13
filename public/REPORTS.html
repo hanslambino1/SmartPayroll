@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SmartPayroll | Dashboard</title>
+  <link rel="icon" type="image/png" href="SPlogo.png">
+  <link rel="stylesheet" href="reports.css">
+</head>
+<body>
+  <div class="container">
+  <!-- Sidebar -->
+  <aside class="sidebar">
+    <div class="sidebar-header">
+      <img src="SPlogo.png" alt="Logo" class="logo">
+    </div>
+    <ul class="menu">
+      <li>
+        <a href="DASHBOARD.html">
+          <img src="bar-graph.png" class="icon"> Dashboard
+        </a>
+      </li>
+      <li>
+        <a href="EMPLOYEES.html">
+          <img src="group.png" class="icon"> Employees
+        </a>
+      </li>
+      <li>
+        <a href="DTR.html">
+          <img src="timetable.png" class="icon"> Daily Time Record
+        </a>
+      </li>
+      <li>
+        <a href="PAYROLL.html">
+          <img src="user.png" class="icon"> Payroll
+        </a>
+      </li>
+      <li class="active">
+        <a href="REPORTS.html">
+          <img src="business-report.png" class="icon"> Reports
+        </a>
+      </li>
+      <li>
+        <a href="SETTINGS.html">
+          <img src="gear.png" class="icon"> Settings
+        </a>
+      </li>
+    </ul>
+
+    <div class="logout-container">
+        <button id="logoutBtn" class="logout-btn">
+          <img src="logout.png" class="icon"/>Logout
+        </button>
+      </div>
+  </aside>
+
+    <!-- Main Content -->
+    <main class="main">
+      <h1>Reports</h1>
+
+      <div class="controls">
+        <select>
+          <option>This Month</option>
+          <option>Last Month</option>
+          <option>This Year</option>
+        </select>
+        <button class="generate">Generate</button>
+      </div>
+
+      <div class="table-container">
+        <table>
+          <thead>
+            <tr>
+              <th>Date</th>
+              <th>Report</th>
+              <th>Status</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>2025-08-31</td>
+              <td>Monthly Payroll Summary</td>
+              <td>Completed</td>
+            </tr>
+            <tr>
+              <td>2025-08-28</td>
+              <td>Employee Deduction Report</td>
+              <td>Completed</td>
+            </tr>
+            <tr>
+              <td>2025-08-15</td>
+              <td>Bi-Monthly Payroll for Aug 1-15</td>
+              <td>Completed</td>
+            </tr>
+            <tr><td colspan="3">&nbsp;</td></tr>
+            <tr><td colspan="3">&nbsp;</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </main>
+  </div>
+
+  <script>
+  window.addEventListener("DOMContentLoaded", () => {
+    const main = document.querySelector(".main");
+
+    // Fade in when page loads
+    setTimeout(() => {
+      main.classList.add("show");
+    }, 50);
+
+    // Example for fade-out when leaving page
+    document.querySelectorAll("a").forEach(link => {
+      link.addEventListener("click", e => {
+        e.preventDefault();
+        main.classList.remove("show");
+        main.classList.add("hide");
+        setTimeout(() => {
+          window.location.href = link.href;
+        }, 500); // wait for animation before navigating
+      });
+    });
+  });
+
+  document.getElementById("logoutBtn").addEventListener("click", () => {
+    if (confirm("Are you sure you want to log out?")) {
+      fetch("/logout")
+        .then(() => window.location.href = "/LOGIN.html")
+        .catch(err => alert("Error logging out. Please try again."));
+    }
+  });
+</script>
+
+
+</body>
+</html>
