@@ -60,12 +60,12 @@ app.get("/api/user", (req, res) => {
 });
 
 // Fetch total employees
-app.get("/api/employees", (req, res) => {
-  db.query("SELECT id, name, dept, position, DATE_FORMAT(date_hired, '%Y-%m-%d') AS date_hired, status FROM employees", (err, results) => {
-    if (err) return res.status(500).json({ error: "DB error" });
-    res.json(results);
-  });
-});
+//app.get("/api/employees", (req, res) => {
+  //db.query("SELECT id, name, dept, position, DATE_FORMAT(date_hired, '%Y-%m-%d') AS date_hired, status FROM employees", (err, results) => {
+    //if (err) return res.status(500).json({ error: "DB error" });
+    //res.json(results);
+  //});
+//});
 
 // Add new employee
 app.post("/api/employees/add", (req, res) => {
@@ -203,28 +203,39 @@ app.get("/logout", (req, res) => {
 const PORT = 3000;
 app.listen(PORT, () => console.log(`🚀 SmartPayroll running on http://localhost:${PORT}`));
 
-
-// Fetch employees by department 
+// Fetch employees (with department filter for the DTR page)
 app.get("/api/employees", (req, res) => {
-  const dept = req.query.department;
-  let sql = "SELECT id, name, dept FROM employees";
-  const values = [];
+  const { department } = req.query;
 
-  if (dept && dept !== "all") {
-    sql += " WHERE dept = ?";
-    values.push(dept);
+  console.log("📩 Received department:", department);
+
+  let sql = `
+    SELECT id, name, dept, position, DATE_FORMAT(date_hired, '%Y-%m-%d') AS date_hired, status 
+    FROM employees
+  `;
+  const params = [];
+
+  if (department && department !== "all") {
+    sql += " WHERE dept LIKE ?";
+    params.push(`%${department}%`);
+    console.log("✅ Using filtered query:", sql, params);
+  } else {
+    console.log("⚠️ No department filter applied.");
   }
 
-  db.query(sql, values, (err, results) => {
+  db.query(sql, params, (err, results) => {
     if (err) {
       console.error("❌ Error fetching employees:", err);
       return res.status(500).json({ error: "Database query failed" });
     }
+
+    console.log("🧾 Query results:", results);
     res.json(results);
   });
 });
 
-// Fetch DTR records for an employee within a date range
+
+// Fetch DTR records 
 app.get("/api/dtr/:employeeId", (req, res) => {
   const { employeeId } = req.params;
   const { coverage } = req.query;
@@ -233,10 +244,18 @@ app.get("/api/dtr/:employeeId", (req, res) => {
   const [start, end] = coverage.split("_to_");
 
   const sql = `
-    SELECT id, date, time_in, time_out, overtime_minutes, undertime_minutes, late_minutes
+    SELECT 
+      id, 
+      DATE(date) AS date,
+      TIME(time_in) AS time_in, 
+      TIME(time_out) AS time_out, 
+      overtime_minutes AS overtime, 
+      undertime_minutes AS undertime, 
+      late_minutes AS late
     FROM dtr
-    WHERE employee_id = ? AND date BETWEEN ? AND ?
-    ORDER BY date ASC
+    WHERE employee_id = ? 
+      AND DATE(date) BETWEEN ? AND ?
+    ORDER BY DATE(date) ASC
   `;
 
   db.query(sql, [employeeId, start, end], (err, results) => {
