@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Smart Payroll - Employee DTR Portal</title>
+  <link rel="stylesheet" href="portal.css">
+</head>
+<body>
+
+  <div class="header">
+    <img src="SPlogo.png" alt="Smart Payroll Logo" class="logo">
+    <h1><span class="smart">Smart</span> <span class="payroll">Payroll</span></h1>
+  </div>
+
+  <!-- Portal Box -->
+  <div class="portal-box">
+    <h2>Employee DTR Portal</h2>
+    <input type="text" id="employeeName" placeholder="Employee Name" pattern="[A-Za-z\s]+" title="Letters only" required>
+    <input type="text" id="employeeId" placeholder="Employee ID" pattern="[0-9]+" title="Numbers only" required>
+    <div class="buttons">
+      <button class="btn">Time In</button>
+      <button class="btn">Time Out</button>
+    </div>
+    <p class="datetime">10/14/2025, 11:45:10 PM</p>
+    <p class="success">Time out recorded at 23:45:09</p>
+  </div>
+
+  <footer>
+    <p>© 2025 SmartPayroll Inc. All rights reserved.</p>
+  </footer>
+
+  <script>
+    const nameInput = document.getElementById("employeeName");
+    const idInput = document.getElementById("employeeId");
+
+    // Allow only letters for name
+    nameInput.addEventListener("input", function() {
+      this.value = this.value.replace(/[^a-zA-Z\s]/g, "");
+    });
+
+    // Allow only numbers for ID
+    idInput.addEventListener("input", function() {
+      this.value = this.value.replace(/[^0-9]/g, "");
+    });
+  </script>
+</body>
+</html>
