@@ -1,0 +1,19 @@
+/* Styles specifically for the payroll cost pie chart */
+.chart-container {
+  width: 270px;
+  height: 270px;
+  margin: 10px auto;
+  position: relative;
+}
+
+.chart-container canvas {
+  width: 100% !important;
+  height: 100% !important;
+}
+
+@media (max-width: 768px) {
+  .chart-container {
+    width: 220px;
+    height: 220px;
+  }
+}
