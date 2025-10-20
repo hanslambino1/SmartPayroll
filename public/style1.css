@@ -6,19 +6,19 @@
 }
 
 body {
-    height: 100vh;
-    background-color: #0f172a; 
-    background-image: radial-gradient(circle at center, rgba(255, 255, 255, 0.08) 1px, transparent 2px);
-    background-size: 20px 20px;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: flex-start;
-    color: white;
-    position: relative;
-    overflow-x: hidden; 
-    opacity: 0; 
-    animation: fadeIn 1.0s ease-in-out forwards; 
+  height: 100vh;
+  background-color: #0f172a; 
+  background-image: radial-gradient(circle at center, rgba(255, 255, 255, 0.08) 1px, transparent 2px);
+  background-size: 20px 20px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  color: white;
+  position: relative;
+  /*overflow-x: hidden;*/ 
+  opacity: 0; 
+  animation: fadeIn 1.0s ease-in-out forwards; 
 }
 
 
@@ -47,12 +47,12 @@ body {
 
 
 .logo img {
-  width: 150px;
+  width: 100px;
   margin-top: 100px;
 }
 
 .logo h2 {
-  font-size: 30px;
+  font-size: 25px;
   color: #fff;
   margin-top: 100px;
 }
@@ -73,7 +73,7 @@ body {
 }
 
 .nav a {
-  font-size: 30px;
+  font-size: 25px;
   color: #ffffff;
   text-decoration: none;
   transition: color 0.6s ease, transform 0.6s ease;
@@ -91,7 +91,7 @@ body {
   justify-content: center;
   flex: 1;
   width: 100%;
-  margin-top: 200px;
+  margin-top: 100px;
 }
 
 .login-box {
@@ -100,11 +100,11 @@ body {
   border-radius: 12px;
   text-align: center;
   width: 100%;
-  max-width: 600px;
+  max-width: 500px;
 }
 .login-box h1 {
   margin-bottom: 25px;
-  font-size: 40px;
+  font-size: 25px;
   font-weight: bold;
 }
 

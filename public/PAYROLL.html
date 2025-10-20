@@ -1,66 +1,42 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
+  <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>SmartPayroll | Dashboard</title>
-  <link rel="icon" type="image/png" href="SPlogo.png">
-  <link rel="stylesheet" href="payroll.css">
+  <title>SmartPayroll | Payroll</title>
+  <link rel="icon" type="image/png" href="SPlogo.png" />
+  <link rel="stylesheet" href="payroll.css" />
 </head>
 <body>
   <div class="container">
-  <!-- Sidebar -->
-  <aside class="sidebar">
-    <div class="sidebar-header">
-      <img src="SPlogo.png" alt="Logo" class="logo">
-    </div>
-    <ul class="menu">
-      <li>
-        <a href="DASHBOARD.html">
-          <img src="bar-graph.png" class="icon"> Dashboard
-        </a>
-      </li>
-      <li>
-        <a href="EMPLOYEES.html">
-          <img src="group.png" class="icon"> Employees
-        </a>
-      </li>
-      <li>
-        <a href="DTR.html">
-          <img src="timetable.png" class="icon"> Daily Time Record
-        </a>
-      </li>
-      <li  class="active">
-        <a href="PAYROLL.html">
-          <img src="user.png" class="icon"> Payroll
-        </a>
-      </li>
-      <li>
-        <a href="REPORTS.html">
-          <img src="business-report.png" class="icon"> Reports
-        </a>
-      </li>
-      <li>
-        <a href="SETTINGS.html">
-          <img src="gear.png" class="icon"> Settings
-        </a>
-      </li>
-    </ul>
+    <!-- Sidebar -->
+    <aside class="sidebar">
+      <div class="sidebar-header">
+        <img src="SPlogo.png" alt="Logo" class="logo" />
+      </div>
+      <ul class="menu">
+        <li><a href="DASHBOARD.html"><img src="bar-graph.png" class="icon" /> Dashboard</a></li>
+        <li><a href="EMPLOYEES.html"><img src="group.png" class="icon" /> Employees</a></li>
+        <li><a href="DTR.html"><img src="timetable.png" class="icon" /> Daily Time Record</a></li>
+        <li class="active"><a href="PAYROLL.html"><img src="user.png" class="icon" /> Payroll</a></li>
+        <li><a href="REPORTS.html"><img src="business-report.png" class="icon" /> Reports</a></li>
+        <li><a href="SETTINGS.html"><img src="gear.png" class="icon" /> Settings</a></li>
+      </ul>
 
-    <div class="logout-container">
+      <div class="logout-container">
         <button id="logoutBtn" class="logout-btn">
-          <img src="logout.png" class="icon"/>Logout
+          <img src="logout.png" class="icon" />Logout
         </button>
       </div>
-  </aside>
+    </aside>
 
     <!-- Main Content -->
     <main class="main">
       <h1>Payroll</h1>
 
       <div class="controls">
-        <select>
-          <option>Monthly</option>
+        <select id="coverage">
+          <option value="monthly">Monthly</option>
         </select>
         <button class="compute" id="computeBtn">Compute</button>
       </div>
@@ -70,30 +46,15 @@
           <thead>
             <tr>
               <th>Name</th>
-              <th>Salary</th>
-              <th>Deduction</th>
-              <th>Net Salary</th>
+              <th>Position</th>
+              <th>Department</th>
+              <th>Basic Salary</th>
+              <th>Deductions</th>
+              <th>Net Pay</th>
             </tr>
           </thead>
-          <tbody>
-            <tr>
-              <td contenteditable="true">Juan Dela Cruz</td>
-              <td><span class="peso">₱</span><span class="amount" contenteditable="true">13500.00</span></td>
-              <td><span class="peso">₱</span><span class="amount" contenteditable="true">1200.00</span></td>
-              <td><span class="peso">₱</span><span class="amount" contenteditable="true">12300.00</span></td>
-            </tr>
-            <tr>
-              <td contenteditable="true">Juana Cruz</td>
-              <td><span class="peso">₱</span><span class="amount" contenteditable="true">15750.00</span></td>
-              <td><span class="peso">₱</span><span class="amount" contenteditable="true">1500.00</span></td>
-              <td><span class="peso">₱</span><span class="amount" contenteditable="true">14250.00</span></td>
-            </tr>
-            <tr>
-              <td contenteditable="true">Jhon De Guzman</td>
-              <td><span class="peso">₱</span><span class="amount" contenteditable="true">14850.00</span></td>
-              <td><span class="peso">₱</span><span class="amount" contenteditable="true">1300.00</span></td>
-              <td><span class="peso">₱</span><span class="amount" contenteditable="true">13550.00</span></td>
-            </tr>
+          <tbody id="payrollBody">
+            <!-- Dynamic rows will load here -->
           </tbody>
         </table>
       </div>
@@ -101,36 +62,77 @@
   </div>
 
   <script>
-  window.addEventListener("DOMContentLoaded", () => {
-    const main = document.querySelector(".main");
+    // Smooth transition animation
+    window.addEventListener("DOMContentLoaded", () => {
+      const main = document.querySelector(".main");
+      setTimeout(() => main.classList.add("show"), 50);
 
-    // Fade in when page loads
-    setTimeout(() => {
-      main.classList.add("show");
-    }, 50);
-
-    // Example for fade-out when leaving page
-    document.querySelectorAll("a").forEach(link => {
-      link.addEventListener("click", e => {
-        e.preventDefault();
-        main.classList.remove("show");
-        main.classList.add("hide");
-        setTimeout(() => {
-          window.location.href = link.href;
-        }, 500); // wait for animation before navigating
+      document.querySelectorAll("a").forEach(link => {
+        link.addEventListener("click", e => {
+          e.preventDefault();
+          main.classList.remove("show");
+          main.classList.add("hide");
+          setTimeout(() => (window.location.href = link.href), 500);
+        });
       });
+
+      loadEmployees();
     });
-  });
 
-  document.getElementById("logoutBtn").addEventListener("click", () => {
-    if (confirm("Are you sure you want to log out?")) {
-      fetch("/logout")
-        .then(() => window.location.href = "/LOGIN.html")
-        .catch(err => alert("Error logging out. Please try again."));
+    // Logout
+    document.getElementById("logoutBtn").addEventListener("click", () => {
+      if (confirm("Are you sure you want to log out?")) {
+        fetch("/logout")
+          .then(() => (window.location.href = "/LOGIN.html"))
+          .catch(() => alert("Error logging out."));
+      }
+    });
+
+    // Load employees from backend
+    async function loadEmployees() {
+      try {
+        const res = await fetch("/api/employees");
+        const employees = await res.json();
+        const tbody = document.getElementById("payrollBody");
+        tbody.innerHTML = "";
+
+        employees.forEach(emp => {
+          const tr = document.createElement("tr");
+          tr.innerHTML = `
+            <td>${emp.name}</td>
+            <td>${emp.position}</td>
+            <td>${emp.dept}</td>
+            <td>₱ <span class="amount">${emp.salary || "0.00"}</span></td>
+            <td>₱ <span class="amount">0.00</span></td>
+            <td>₱ <span class="amount">${emp.salary || "0.00"}</span></td>
+          `;
+          tbody.appendChild(tr);
+        });
+      } catch (err) {
+        console.error("❌ Error loading employees:", err);
+        alert("Failed to load employee data.");
+      }
     }
-  });
-</script>
 
+    // Simple payroll compute example
+    document.getElementById("computeBtn").addEventListener("click", () => {
+      const rows = document.querySelectorAll("#payrollBody tr");
 
+      rows.forEach(row => {
+        const salaryCell = row.querySelectorAll(".amount")[0];
+        const deductionCell = row.querySelectorAll(".amount")[1];
+        const netCell = row.querySelectorAll(".amount")[2];
+
+        const salary = parseFloat(salaryCell.textContent.replace(/,/g, "")) || 0;
+        const deductions = Math.round(salary * 0.08); // sample 8% deduction
+        const net = salary - deductions;
+
+        deductionCell.textContent = deductions.toLocaleString("en-PH", { minimumFractionDigits: 2 });
+        netCell.textContent = net.toLocaleString("en-PH", { minimumFractionDigits: 2 });
+      });
+
+      alert("Payroll computed successfully!");
+    });
+  </script>
 </body>
 </html>

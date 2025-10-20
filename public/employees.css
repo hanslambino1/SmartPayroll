@@ -234,7 +234,9 @@ table {
 }
 
 thead {
-  background: #3b36c0; 
+  background: #0D2A4B; 
+  background-image: radial-gradient(circle at center, rgba(255, 255, 255, 0.08) 1px, transparent 2px);
+  background-size: 20px 20px;
   color: white;
 }
 
@@ -709,4 +711,126 @@ tbody td {
   .card {
     padding: 15px;
   }
+}
+
+
+/* Confirmation Modal */
+.confirm-modal,
+.success-modal {
+  position: fixed;
+  top: 0; left: 0;
+  width: 100%; height: 100%;
+  background: rgba(0,0,0,0.45);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+  transition: opacity 0.3s ease;
+}
+
+.confirm-modal-content,
+.success-modal-content {
+  background: #f1f1f1;
+  width: 450px;
+  border-radius: 10px;
+  overflow: hidden;
+  box-shadow: 0 6px 20px rgba(0,0,0,0.3);
+}
+
+/* Headers */
+.confirm-modal-header,
+.success-modal-header {
+  background: #0D2A4B;
+  color: white;
+  padding: 16px 24px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background-image: radial-gradient(circle at center, rgba(255, 255, 255, 0.08) 1px, transparent 2px);
+  background-size: 20px 20px;
+}
+
+.confirm-modal-header h2,
+.success-modal-header h2 {
+  margin: 0;
+  font-weight: bold;
+  font-size: 18px;
+}
+
+.confirm-modal-header .close,
+.success-modal-header .close {
+  background: none;
+  border: none;
+  color: white;
+  font-size: 24px;
+  cursor: pointer;
+}
+
+/* Body */
+.confirm-modal-body,
+.success-modal-body {
+  padding: 25px;
+  text-align: center;
+  font-size: 15px;
+  color: #333;
+}
+
+/* Footer */
+.confirm-modal-footer,
+.success-modal-footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  padding: 15px 25px;
+  border-top: 1px solid #eee;
+}
+
+.btn-cancel {
+  padding: 10px 18px;
+  border: none;
+  border-radius: 6px;
+  font-weight: 600;
+  cursor: pointer;
+  background: #f2f2f2;
+  color: #333;
+  transition: background 0.2s ease;
+}
+
+.btn-cancel:hover {
+  background: #e6e6e6;
+}
+
+.btn-save {
+  padding: 10px 18px;
+  border: none;
+  border-radius: 6px;
+  font-weight: 600;
+  cursor: pointer;
+  background: #3b36c0;
+  color: #fff;
+  transition: background 0.2s ease;
+}
+
+.btn-save:hover {
+  background: #2d2ab5;
+}
+
+.hidden {
+  display: none;
+}
+
+.modal {
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.25s ease;
+}
+
+.modal:not(.hidden) {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+@keyframes slideDown {
+  from { transform: translateY(-30px); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
 }

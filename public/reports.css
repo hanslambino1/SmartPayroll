@@ -212,7 +212,7 @@ select {
 }
 
 .generate {
-  background-color: #2E3BD8;
+  background-color: #1e3aaf;
   border: none;
   padding: 10px 20px;
   color: white;
@@ -222,7 +222,7 @@ select {
 }
 
 .generate:hover {
-  background-color: #1a26a6;
+  background-color: #142a80;
 }
 
 /* Table */
@@ -232,7 +232,9 @@ table {
 }
 
 thead {
-  background-color: #2E3BD8;
+  background-color: #0D2A4B;
+  background-image: radial-gradient(circle at center, rgba(255, 255, 255, 0.08) 1px, transparent 2px);
+  background-size: 20px 20px;
   color: white;
 }
 

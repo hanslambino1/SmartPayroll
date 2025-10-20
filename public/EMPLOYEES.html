@@ -168,7 +168,7 @@
 
       <div class="form-group">
         <label>Employee Name</label>
-        <input type="text" name="name" placeholder="Employee Name" required />
+        <input type="text" name="name" placeholder="Employee Name" required maxlength="50" />
       </div>
 
       <div class="form-group">
@@ -209,12 +209,12 @@
 
       <div class="form-group">
         <label>Emergency Contact Name</label>
-        <input type="text" name="emergency_contact_name" placeholder="Emergency Contact Name" />
+        <input type="text" name="emergency_contact_name" placeholder="Emergency Contact Name" maxlength="50" />
       </div>
 
       <div class="form-group">
         <label>Emergency Contact Number</label>
-        <input type="text" name="emergency_contact_no" placeholder="Emergency Contact Number" />
+        <input type="text" name="emergency_contact_no" placeholder="Emergency Contact Number" maxlength="11"/>
       </div>
 
       <div class="form-group">
@@ -264,6 +264,72 @@
 </div>
 
 
+<!-- Add Employee Confirmation Modal -->
+<div id="confirmAddModal" class="confirm-modal hidden">
+  <div class="confirm-modal-content">
+    <div class="confirm-modal-header">
+      <h2>Confirm Add Employee</h2>
+      <button class="close" id="confirmClose">&times;</button>
+    </div>
+    <div class="confirm-modal-body">
+      <p><b>Are you sure you want to add this employee?</b></p>
+    </div>
+    <div class="confirm-modal-footer">
+      <button class="btn-cancel" id="confirmNoBtn">No</button>
+      <button class="btn-save" id="confirmYesBtn">Yes</button>
+    </div>
+  </div>
+</div>
+
+<!-- Add Employee Success Modal -->
+<div id="successAddModal" class="success-modal hidden">
+  <div class="success-modal-content">
+    <div class="success-modal-header">
+      <h2>Success</h2>
+      <button class="close" id="successClose">&times;</button>
+    </div>
+    <div class="success-modal-body">
+      <p><b>✓ Employee successfully added!</b></p>
+    </div>
+    <div class="success-modal-footer">
+      <button class="btn-save" id="successOkBtn">OK</button>
+    </div>
+  </div>
+</div>
+
+<!-- Confirm Resign Modal -->
+<div id="confirmResignModal" class="confirm-modal hidden">
+  <div class="confirm-modal-content">
+    <div class="confirm-modal-header">
+      <h2>Confirm Resignation</h2>
+      <button class="close" id="closeConfirmResign">&times;</button>
+    </div>
+    <div class="confirm-modal-body">
+      <p><b>Are you sure you want to move this employee to the resigned list?</b></p>
+    </div>
+    <div class="confirm-modal-footer">
+      <button class="btn-cancel" id="confirmResignNo">No</button>
+      <button class="btn-save" id="confirmResignYes">Yes</button>
+    </div>
+  </div>
+</div>
+
+<!-- Success Resign Modal -->
+<div id="successResignModal" class="success-modal hidden">
+  <div class="success-modal-content">
+    <div class="success-modal-header">
+      <h2>Success</h2>
+      <button class="close" id="closeSuccessResign">&times;</button>
+    </div>
+    <div class="success-modal-body">
+      <p><b>✓ Employee has been successfully moved to the resigned list!</b></p>
+    </div>
+    <div class="success-modal-footer">
+      <button class="btn-save" id="successResignOk">OK</button>
+    </div>
+  </div>
+</div>
+
   <script>
     // Load Employees
 document.addEventListener("DOMContentLoaded", loadEmployees);
@@ -301,31 +367,7 @@ async function loadEmployees() {
   }
 }
 
-// Handle Resign Button
-document.addEventListener("click", async (e) => {
-  if (e.target.classList.contains("resign-btn")) {
-    const id = e.target.dataset.id;
-    if (!confirm("Are you sure you want to mark this employee as resigned?")) return;
 
-    try {
-      const res = await fetch(`/api/employees/resign/${id}`, {
-        method: "POST"
-      });
-
-      const result = await res.json();
-
-      if (res.ok) {
-        alert("✅ Employee moved to resigned list!");
-        loadEmployees(); // refresh table
-      } else {
-        alert("❌ " + result.error);
-      }
-    } catch (err) {
-      console.error("Error resigning employee:", err);
-      alert("❌ Error moving employee to resigned list");
-    }
-  }
-});
 
    // Handle Edit button click
 document.addEventListener("click", async (e) => {
@@ -340,7 +382,6 @@ document.addEventListener("click", async (e) => {
         const form = document.getElementById("editEmployeeForm");
         for (const key in emp) {
       if (form[key]) {
-        // Format date for date input
         if (key === "date_hired" && emp[key]) {
           form[key].value = emp[key].split("T")[0]; // YYYY-MM-DD format
         } else {
@@ -371,84 +412,85 @@ document.getElementById("cancelEdit").addEventListener("click", () => {
 document.getElementById("editEmployeeForm").addEventListener("submit", async (e) => {
   e.preventDefault();
   const form = e.target;
-  const id = form.id.value;
-
-  const data = Object.fromEntries(new FormData(form).entries());
+  const data = Object.fromEntries(new FormData(form));
+  const id = data.id;
 
   try {
     const res = await fetch(`/api/employees/update/${id}`, {
       method: "PUT",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(data)
+      body: JSON.stringify(data),
+    });
+
+    const result = await res.json();
+    if (res.ok) {
+      alert("✅ Employee updated successfully!");
+      document.getElementById("editModal").classList.add("hidden");
+      loadEmployees();
+    } else {
+      alert("❌ " + result.error);
+    }
+  } catch (err) {
+    alert("❌ Error saving changes");
+    console.error(err);
+  }
+});
+
+
+   // Add Employee with Confirmation and Success Modals
+const addForm = document.getElementById("addEmployeeForm");
+const confirmModal = document.getElementById("confirmAddModal");
+const successModal = document.getElementById("successAddModal");
+
+const confirmYesBtn = document.getElementById("confirmYesBtn");
+const confirmNoBtn = document.getElementById("confirmNoBtn");
+const confirmClose = document.getElementById("confirmClose");
+
+const successOkBtn = document.getElementById("successOkBtn");
+const successClose = document.getElementById("successClose");
+
+// Show confirmation modal on form submit
+addForm.addEventListener("submit", (e) => {
+  e.preventDefault();
+  confirmModal.classList.remove("hidden");
+});
+
+// Close confirmation modal
+confirmNoBtn.addEventListener("click", () => confirmModal.classList.add("hidden"));
+confirmClose.addEventListener("click", () => confirmModal.classList.add("hidden"));
+
+// Close success modal
+successOkBtn.addEventListener("click", () => successModal.classList.add("hidden"));
+successClose.addEventListener("click", () => successModal.classList.add("hidden"));
+
+// User clicks "Yes" -> submit form
+confirmYesBtn.addEventListener("click", async () => {
+  confirmModal.classList.add("hidden"); // hide confirmation modal
+  const data = Object.fromEntries(new FormData(addForm));
+
+  try {
+    const res = await fetch("/api/employees/add", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(data),
     });
 
     const result = await res.json();
 
     if (res.ok) {
-      alert("✅ Employee updated successfully!");
-      document.getElementById("editModal").classList.add("hidden");
-      loadEmployees(); // refresh table
+      successModal.classList.remove("hidden"); // show success modal
+      addForm.reset();
+      loadEmployees();
     } else {
-      alert("❌ Error: " + result.error);
+      alert("❌ " + result.error);
     }
   } catch (err) {
-    console.error("Error saving changes:", err);
-    alert("❌ Error saving changes");
+    alert("Server error while adding employee.");
+    console.error(err);
   }
 });
 
-    // Save Edit
-    document.getElementById("editEmployeeForm").addEventListener("submit", async e => {
-      e.preventDefault();
-      const form = e.target;
-      const data = Object.fromEntries(new FormData(form));
 
-      try {
-        const res = await fetch(`/api/employees/update/${data.id}`, {
-          method: "PUT",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(data),
-        });
-        const result = await res.json();
-
-        if (res.ok) {
-          alert("✅ Employee updated successfully!");
-          document.getElementById("editModal").classList.add("hidden");
-          loadEmployees();
-        } else {
-          alert("❌ " + result.error);
-        }
-      } catch (err) {
-        alert("Error saving changes.");
-        console.error(err);
-      }
-    });
-
-    // Add Employee
-    document.getElementById("addEmployeeForm").addEventListener("submit", async e => {
-      e.preventDefault();
-      const form = e.target;
-      const data = Object.fromEntries(new FormData(form));
-      try {
-        const res = await fetch("/api/employees/add", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(data),
-        });
-        const result = await res.json();
-
-        if (res.ok) {
-          alert("✅ Employee added successfully!");
-          form.reset();
-          loadEmployees();
-        } else {
-          alert("❌ " + result.error);
-        }
-      } catch (err) {
-        alert("Server error while adding employee.");
-        console.error(err);
-      }
-    });
 
     document.addEventListener("DOMContentLoaded", loadEmployees);
 
@@ -526,9 +568,110 @@ function searchEmployees() {
 });
 
 
+const nameFields = document.querySelectorAll(
+  'input[name="name"], input[name="emergency_contact_name"]'
+);
+const maxNameLength = 50;
+
+nameFields.forEach(field => {
+  field.addEventListener("input", () => {
+    // Only letters and spaces
+    field.value = field.value.replace(/[^a-zA-Z\s]/g, "");
+
+    // Trim to max length
+    if (field.value.length > maxNameLength) {
+      field.value = field.value.slice(0, maxNameLength);
+    }
+  });
+});
 
 
+// Digits only + max length
+const numberFields = [
+  { selector: 'input[name="contact_no"]', max: 11 },
+  { selector: 'input[name="emergency_contact_no"]', max: 11 },
+  { selector: 'input[name="sss_no"]', max: 12 },
+  { selector: 'input[name="philhealth_no"]', max: 12 },
+  { selector: 'input[name="pagibig_no"]', max: 12 },
+  { selector: 'input[name="atm_no"]', max: 16 } 
+];
+
+numberFields.forEach(fieldObj => {
+  const field = document.querySelector(fieldObj.selector);
+  const maxLength = fieldObj.max;
+
+  field.addEventListener("input", () => {
+    // Remove non-digits
+    field.value = field.value.replace(/\D/g, "");
+
+    // Trim to maxLength
+    if (field.value.length > maxLength) {
+      field.value = field.value.slice(0, maxLength);
+    }
+  });
+});
+;
+
+// ===== RESIGN MODALS =====
+const confirmResignModal = document.getElementById("confirmResignModal");
+const successResignModal = document.getElementById("successResignModal");
+
+const confirmResignYes = document.getElementById("confirmResignYes");
+const confirmResignNo = document.getElementById("confirmResignNo");
+const closeConfirmResign = document.getElementById("closeConfirmResign");
+const closeSuccessResign = document.getElementById("closeSuccessResign");
+const successResignOk = document.getElementById("successResignOk");
+
+let employeeToResign = null;
+
+// Function to open confirm modal
+function openConfirmResignModal(employeeId) {
+  employeeToResign = employeeId;
+  confirmResignModal.classList.remove("hidden");
+}
+
+// Close any modal
+function closeResignModals() {
+  confirmResignModal.classList.add("hidden");
+  successResignModal.classList.add("hidden");
+}
+
+// Event listeners for closing
+confirmResignNo.addEventListener("click", closeResignModals);
+closeConfirmResign.addEventListener("click", closeResignModals);
+closeSuccessResign.addEventListener("click", closeResignModals);
+successResignOk.addEventListener("click", closeResignModals);
+
+// Confirm resignation (Yes)
+confirmResignYes.addEventListener("click", async () => {
+  if (!employeeToResign) return;
+
+  try {
+    const res = await fetch(`/api/employees/resign/${employeeToResign}`, {
+      method: "POST",
+    });
+    const data = await res.json();
+
+    if (res.ok) {
+      closeResignModals();
+      successResignModal.classList.remove("hidden");
+      loadEmployees(); // reload employees table
+    } else {
+      alert("❌ " + data.error);
+    }
+  } catch (error) {
+    console.error("Error resigning employee:", error);
+    alert("❌ Server error while resigning employee.");
+  }
+});
+
+// Handle Resign button click
+document.addEventListener("click", (e) => {
+  if (e.target.classList.contains("resign-btn")) {
+    const id = e.target.dataset.id;
+    openConfirmResignModal(id);
+  }
+});
   </script>
 </body>
 </html>
-
