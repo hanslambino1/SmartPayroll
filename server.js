@@ -288,7 +288,10 @@ app.put("/api/dtr/update/:id", (req, res) => {
 // Move employee to resigned_employees
 app.post("/api/employees/resign/:id", (req, res) => {
   const { id } = req.params;
-  const date_resigned = new Date();
+  const now = new Date();
+  const phDate = new Date(now.toLocaleString("en-US", { timeZone: "Asia/Manila" }));
+  const date_resigned = phDate.toISOString().split("T")[0];
+
 
   // Fetch employee info first
   db.query("SELECT * FROM employees WHERE id = ?", [id], (err, results) => {
@@ -310,7 +313,7 @@ app.post("/api/employees/resign/:id", (req, res) => {
       emp.dept,
       emp.position,
       emp.date_hired,
-      date_resigned,
+      emp.date_resigned,
       emp.salary,
       emp.emergency_contact_name,
       emp.emergency_contact_no,
@@ -345,16 +348,26 @@ app.post("/api/employees/resign/:id", (req, res) => {
 
 // Fetch resigned employees
 app.get("/api/resigned", (req, res) => {
-  db.query(
-    "SELECT id, name, dept, position, date_hired, date_resigned, status FROM resigned_employees",
-    (err, results) => {
-      if (err) {
-        console.error("❌ Error fetching resigned employees:", err);
-        return res.status(500).json({ error: "Database error" });
-      }
-      res.json(results);
+  const sql = `
+    SELECT 
+      id, 
+      name, 
+      dept, 
+      position, 
+      DATE_FORMAT(date_hired, '%Y-%m-%d') AS date_hired,
+      DATE_FORMAT(date_resigned, '%Y-%m-%d') AS date_resigned,
+      status 
+    FROM resigned_employees
+  `;
+  db.query(sql, (err, results) => {
+    if (err) {
+      console.error("❌ Error fetching resigned employees:", err);
+      return res.status(500).json({ error: "Database error" });
     }
-  );
+    console.log("🧾 Raw DB Results:", results);
+
+    res.json(results);
+  });
 });
 
 
@@ -467,6 +480,142 @@ app.put("/api/resigned/update/:id", (req, res) => {
     res.json({ success: true });
   });
 });
+
+
+// ====== EMPLOYEE TIME IN ======
+app.post("/api/dtr/timein", (req, res) => {
+  const { name, employeeID } = req.body;
+  if (!name || !employeeID) {
+    return res.status(400).json({ message: "Missing name or employee ID" });
+  }
+
+  // ✅ Timezone-safe PH date and time
+  const now = new Date();
+  const phDateTime = new Intl.DateTimeFormat("en-CA", {
+    timeZone: "Asia/Manila",
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+    hour: "2-digit",
+    minute: "2-digit",
+    second: "2-digit",
+    hour12: false,
+  }).format(now);
+
+  const [datePH, timeIn] = phDateTime.split(", ");
+
+  console.log("=== 🕓 TIME-IN FIXED DEBUG ===");
+  console.log("🕰 Raw UTC Date:", now);
+  console.log("🇵🇭 Formatted PH DateTime:", phDateTime);
+  console.log("📅 Final Date Used:", datePH);
+  console.log("⏰ Final Time Used:", timeIn);
+  console.log("==============================");
+
+  // ✅ Check if employee already timed in today
+  const checkSql = `SELECT * FROM dtr WHERE employee_id = ? AND DATE(date) = ?`;
+  db.query(checkSql, [employeeID, datePH], (err, results) => {
+    if (err) {
+      console.error("❌ Error checking DTR:", err);
+      return res.status(500).json({ message: "Database error" });
+    }
+
+    if (results.length > 0) {
+      return res.json({
+        message: `You already timed in today at ${results[0].time_in}`,
+      });
+    }
+
+    // ✅ Proper INSERT — include employee_name
+    const insertSql = `
+      INSERT INTO dtr (employee_id, employee_name, date, time_in)
+      VALUES (?, ?, ?, ?)
+    `;
+
+    db.query(insertSql, [employeeID, name, datePH, timeIn], (err2) => {
+      if (err2) {
+        console.error("❌ Error recording time-in:", err2);
+        return res.status(500).json({ message: "Error recording time in." });
+      }
+
+      console.log(`✅ ${name} (${employeeID}) timed in at ${timeIn}`);
+      res.json({ message: `Time in recorded at ${timeIn}` });
+    });
+  });
+});
+
+
+
+// ====== EMPLOYEE TIME OUT ======
+app.post("/api/dtr/timeout", (req, res) => {
+  const { name, employeeID } = req.body;
+  if (!name || !employeeID) {
+    return res.status(400).json({ message: "Missing name or employee ID" });
+  }
+
+  // ✅ Timezone-safe PH date and time
+  const now = new Date();
+  const phDateTime = new Intl.DateTimeFormat("en-CA", {
+    timeZone: "Asia/Manila",
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+    hour: "2-digit",
+    minute: "2-digit",
+    second: "2-digit",
+    hour12: false,
+  }).format(now);
+
+  const [datePH, timeOut] = phDateTime.split(", ");
+
+  console.log("=== 🕓 TIME-OUT FIXED DEBUG ===");
+  console.log("🕰 Raw UTC Date:", now);
+  console.log("🇵🇭 Formatted PH DateTime:", phDateTime);
+  console.log("📅 Final Date Used:", datePH);
+  console.log("⏰ Final Time Used:", timeOut);
+  console.log("==============================");
+
+  // ✅ Check if employee has a time-in today
+  const checkSql = `SELECT * FROM dtr WHERE employee_id = ? AND DATE(date) = ?`;
+  db.query(checkSql, [employeeID, datePH], (err, results) => {
+    if (err) {
+      console.error("❌ Error checking DTR:", err);
+      return res.status(500).json({ message: "Database error" });
+    }
+
+    if (results.length === 0) {
+      // No time-in found, insert a new record with time-out only
+      const insertSql = `
+        INSERT INTO dtr (employee_id, employee_name, date, time_out)
+        VALUES (?, ?, ?, ?)
+      `;
+      db.query(insertSql, [employeeID, name, datePH, timeOut], (err2) => {
+        if (err2) {
+          console.error("❌ Error inserting time-out:", err2);
+          return res.status(500).json({ message: "Error recording time out." });
+        }
+        console.log(`⚠️ ${name} (${employeeID}) timed out without time-in at ${timeOut}`);
+        return res.json({
+          message: `Time-out recorded at ${timeOut} (no prior time-in found)`,
+        });
+      });
+    } else {
+      // ✅ Update existing DTR record
+      const updateSql = `
+        UPDATE dtr SET time_out = ? 
+        WHERE employee_id = ? AND DATE(date) = ?
+      `;
+      db.query(updateSql, [timeOut, employeeID, datePH], (err2) => {
+        if (err2) {
+          console.error("❌ Error updating time-out:", err2);
+          return res.status(500).json({ message: "Error recording time out." });
+        }
+        console.log(`✅ ${name} (${employeeID}) timed out at ${timeOut}`);
+        res.json({ message: `Time-out recorded at ${timeOut}` });
+      });
+    }
+  });
+});
+
 
 
 
