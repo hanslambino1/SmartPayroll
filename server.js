@@ -313,7 +313,7 @@ app.post("/api/employees/resign/:id", (req, res) => {
       emp.dept,
       emp.position,
       emp.date_hired,
-      emp.date_resigned,
+      date_resigned,
       emp.salary,
       emp.emergency_contact_name,
       emp.emergency_contact_no,
@@ -324,6 +324,15 @@ app.post("/api/employees/resign/:id", (req, res) => {
       emp.pagibig_no,
       emp.atm_no
     ];
+
+    console.log("=== RESIGN DEBUG ===");
+    console.log("Raw Date (UTC):", now);
+    console.log("Converted PH Date:", phDate);
+    console.log("Final date_resigned:", date_resigned);
+    console.log("Employee fetched:", emp.name);
+    console.log("Insert values:", insertValues);
+    console.log("====================");
+
 
     db.query(insertSql, insertValues, (err2) => {
       if (err2) {
