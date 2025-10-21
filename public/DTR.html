@@ -269,7 +269,24 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   });
 });
+
+    // Calculate Late, Undertime, Overtime in minutes
+function calculateDTR(timeIn, timeOut, workStart="08:00:00", workEnd="16:00:00") {
+  const msInMinute = 60000;
+
+  const start = new Date(`1970-01-01T${workStart}`);
+  const end = new Date(`1970-01-01T${workEnd}`);
+  const inTime = timeIn ? new Date(`1970-01-01T${timeIn}`) : null;
+  const outTime = timeOut ? new Date(`1970-01-01T${timeOut}`) : null;
+
+  const late = inTime ? Math.max(0, Math.floor((inTime - start) / msInMinute)) : 0;
+  const undertime = outTime ? Math.max(0, Math.floor((end - outTime) / msInMinute)) : 0;
+  const overtime = outTime ? Math.max(0, Math.floor((outTime - end) / msInMinute)) : 0;
+
+  return { late, undertime, overtime };
+}
 </script>
 </body>
 </html>
+
 
