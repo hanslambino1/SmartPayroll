@@ -74,6 +74,7 @@ app.post("/api/employees/add", (req, res) => {
     dept,
     position,
     status,
+    activity_status,
     date_hired,
     salary,
     emergency_contact_name,
@@ -87,14 +88,14 @@ app.post("/api/employees/add", (req, res) => {
   } = req.body;
 
   // basic validation
-  if (!name || !dept || !position || !status || !date_hired) {
+  if (!name || !dept || !position || !status || !activity_status || !date_hired) {
     return res.status(400).json({ error: "Missing required fields" });
   }
 
   const sql = `
     INSERT INTO employees 
-    (name, dept, position, status, date_hired, salary, emergency_contact_name, emergency_contact_no, contact_no, address, sss_no, philhealth_no, pagibig_no, atm_no)
-    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+    (name, dept, position, status, activity_status, date_hired, salary, emergency_contact_name, emergency_contact_no, contact_no, address, sss_no, philhealth_no, pagibig_no, atm_no)
+    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
   `;
 
   const values = [
@@ -102,6 +103,7 @@ app.post("/api/employees/add", (req, res) => {
     dept,
     position,
     status,
+    activity_status,
     date_hired,
     salary || null,
     emergency_contact_name || null,
@@ -159,7 +161,7 @@ app.put("/api/employees/update/:id", (req, res) => {
 
   const sql = `
     UPDATE employees 
-    SET name=?, dept=?, position=?, status=?, date_hired=?, salary=?, 
+    SET name=?, dept=?, position=?, status=?, activity_status=?, date_hired=?, salary=?, 
         emergency_contact_name=?, emergency_contact_no=?, contact_no=?, 
         address=?, sss_no=?, philhealth_no=?, pagibig_no=?, atm_no=? 
     WHERE id=?`;
@@ -169,6 +171,7 @@ app.put("/api/employees/update/:id", (req, res) => {
     data.dept,
     data.position,
     data.status,
+    data.activity_status,
     data.date_hired,
     data.salary,
     data.emergency_contact_name,
@@ -181,6 +184,7 @@ app.put("/api/employees/update/:id", (req, res) => {
     data.atm_no,
     id
   ];
+
 
   db.query(sql, values, (err, result) => {
     if (err) {
@@ -209,10 +213,11 @@ app.get("/api/employees", (req, res) => {
 
   console.log("📩 Received department:", department);
 
-  let sql = `
-    SELECT id, name, dept, position, DATE_FORMAT(date_hired, '%Y-%m-%d') AS date_hired, status 
+    let sql = `
+    SELECT id, name, dept, position, DATE_FORMAT(date_hired, '%Y-%m-%d') AS date_hired, status, activity_status
     FROM employees
   `;
+
   const params = [];
 
   if (department && department !== "all") {
@@ -545,7 +550,6 @@ app.post("/api/dtr/timein", (req, res) => {
         console.error("❌ Error recording time-in:", err2);
         return res.status(500).json({ message: "Error recording time in." });
       }
-
       console.log(`✅ ${name} (${employeeID}) timed in at ${timeIn}`);
       res.json({ message: `Time in recorded at ${timeIn}` });
     });
@@ -602,6 +606,15 @@ app.post("/api/dtr/timeout", (req, res) => {
           console.error("❌ Error inserting time-out:", err2);
           return res.status(500).json({ message: "Error recording time out." });
         }
+
+        // ✅ Update employee status to Active
+        const updateStatusSql = `UPDATE employees SET activity_status = 'Active' WHERE employee_id = ?`;
+        db.query(updateStatusSql, [employeeID], (err3) => {
+          if (err3) {
+            console.error("⚠️ Error updating employee status:", err3);
+          }
+        });
+
         console.log(`⚠️ ${name} (${employeeID}) timed out without time-in at ${timeOut}`);
         return res.json({
           message: `Time-out recorded at ${timeOut} (no prior time-in found)`,
@@ -624,6 +637,7 @@ app.post("/api/dtr/timeout", (req, res) => {
     }
   });
 });
+
 
 
 
