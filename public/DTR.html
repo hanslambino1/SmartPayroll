@@ -110,7 +110,7 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     try {
-      const res = await fetch(`/api/employees?department=${dept}`);
+      const res = await fetch(`/api/employees?department=${dept}&coverage=${coverage}`);
       const employees = await res.json();
 
       console.log("Employees loaded:", employees); 
@@ -272,3 +272,4 @@ document.addEventListener("DOMContentLoaded", () => {
 </script>
 </body>
 </html>
+
