@@ -209,35 +209,47 @@ app.listen(PORT, () => console.log(`🚀 SmartPayroll running on http://localhos
 
 // Fetch employees (with department filter for the DTR page)
 app.get("/api/employees", (req, res) => {
-  const { department } = req.query;
+  const { department, coverage } = req.query;
 
-  console.log("📩 Received department:", department);
+  // Parse coverage dates
+  let startDate = null, endDate = null;
+  if (coverage) {
+    [startDate, endDate] = coverage.split("_to_");
+  }
 
-    let sql = `
-    SELECT id, name, dept, position, DATE_FORMAT(date_hired, '%Y-%m-%d') AS date_hired, status, activity_status
-    FROM employees
+  let sql = `
+    SELECT DISTINCT e.id, e.name, e.dept, e.position, 
+           DATE_FORMAT(e.date_hired, '%Y-%m-%d') AS date_hired, 
+           e.status, e.activity_status
+    FROM employees e
+    INNER JOIN dtr d ON e.id = d.employee_id
+    WHERE 1
   `;
 
   const params = [];
 
   if (department && department !== "all") {
-    sql += " WHERE dept LIKE ?";
-    params.push(`%${department}%`);
-    console.log("✅ Using filtered query:", sql, params);
-  } else {
-    console.log("⚠️ No department filter applied.");
+    sql += " AND e.dept = ?";
+    params.push(department);
   }
+
+  if (startDate && endDate) {
+    sql += " AND DATE(d.date) BETWEEN ? AND ?";
+    params.push(startDate, endDate);
+  }
+
+  sql += " ORDER BY e.name ASC";
 
   db.query(sql, params, (err, results) => {
     if (err) {
-      console.error("❌ Error fetching employees:", err);
+      console.error("❌ Error fetching employees with DTR:", err);
       return res.status(500).json({ error: "Database query failed" });
     }
 
-    console.log("🧾 Query results:", results);
     res.json(results);
   });
 });
+
 
 
 // Fetch DTR records 
