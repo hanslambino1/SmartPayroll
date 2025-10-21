@@ -211,30 +211,33 @@ app.listen(PORT, () => console.log(`🚀 SmartPayroll running on http://localhos
 app.get("/api/employees", (req, res) => {
   const { department, coverage } = req.query;
 
-  // Parse coverage dates
-  let startDate = null, endDate = null;
-  if (coverage) {
-    [startDate, endDate] = coverage.split("_to_");
-  }
-
+  let params = [];
   let sql = `
     SELECT DISTINCT e.id, e.name, e.dept, e.position, 
            DATE_FORMAT(e.date_hired, '%Y-%m-%d') AS date_hired, 
            e.status, e.activity_status
     FROM employees e
-    INNER JOIN dtr d ON e.id = d.employee_id
-    WHERE 1
+    WHERE e.status IN ('Regular', 'Probationary')
   `;
 
-  const params = [];
-
+  // Filter by department if provided
   if (department && department !== "all") {
     sql += " AND e.dept = ?";
     params.push(department);
   }
 
-  if (startDate && endDate) {
-    sql += " AND DATE(d.date) BETWEEN ? AND ?";
+  // Filter by coverage dates if provided
+  if (coverage) {
+    const [startDate, endDate] = coverage.split("_to_");
+
+    sql += `
+      AND EXISTS (
+        SELECT 1 
+        FROM dtr d
+        WHERE d.employee_id = e.id
+          AND DATE(d.date) BETWEEN ? AND ?
+      )
+    `;
     params.push(startDate, endDate);
   }
 
@@ -242,13 +245,14 @@ app.get("/api/employees", (req, res) => {
 
   db.query(sql, params, (err, results) => {
     if (err) {
-      console.error("❌ Error fetching employees with DTR:", err);
+      console.error("❌ Error fetching employees:", err);
       return res.status(500).json({ error: "Database query failed" });
     }
 
     res.json(results);
   });
 });
+
 
 
 
