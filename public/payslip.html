@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Smart Payroll - Payslip</title>
+  <link rel="stylesheet" href="payslip.css">
+</head>
+<body>
+  <!-- Header -->
+  <header class="header">
+  <div class="logo-section">
+    <img src="SPlogo.png" alt="Smart Payroll Logo">
+    <h1><strong>Smart</strong> <span class="blue">Payroll</span></h1>
+  </div>
+  <nav class="nav">
+    <a href="homepage.html">Home</a>
+    <span>|</span>
+    <a href="payslip.html" class="active">My Payslip</a>
+  </nav>
+</header>
+
+
+  <!-- Payslip Card -->
+  <main>
+    <div class="payslip-card">
+
+<div class="payslip-header">
+    <h2 id="payslipTitle">Payslip for the month of October 1–15 2025</h2>
+  <select id="payslipPeriod">
+      <option>October 1–15 2025</option>
+      <option>October 16–31 2025</option>
+  </select>
+</div>
+
+
+      <!-- Employee Details -->
+      <div class="employee-details">
+        <div>
+          <p><strong>Name:</strong> Hans Lambino</p>
+          <p><strong>Department:</strong> Finance</p>
+          <p><strong>Employee ID:</strong> 223-001</p>
+      </div>
+
+      <!-- Earnings & Deductions -->
+      <div class="tables">
+        <table>
+          <thead>
+            <tr><th>Earnings</th><th>Amount</th></tr>
+          </thead>
+          <tbody>
+            <tr><td>Basic Salary</td><td>₱ 45,000.00</td></tr>
+            <tr><td>Overtime</td><td>₱ 5,000.00</td></tr>
+    
+          </tbody>
+          <tfoot>
+            <tr><td><strong>Total Earnings</strong></td><td><strong>₱ 53,000.00</strong></td></tr>
+          </tfoot>
+        </table>
+
+        <table>
+          <thead>
+            <tr><th>Deductions</th><th>Amount</th></tr>
+          </thead>
+          <tbody>
+            <tr><td>SSS</td><td>₱ 1,200.00</td></tr>
+            <tr><td>PhilHealth</td><td>₱ 800.00</td></tr>
+            <tr><td>Pag-IBIG</td><td>₱ 200.00</td></tr>
+            <tr><td>Late</td><td>₱ 500.00</td></tr>
+            <tr><td>Undertime</td><td>₱ 1,000.00</td></tr>
+            <tr><td>Tax</td><td>₱ 3,000.00</td></tr>
+          </tbody>
+          <tfoot>
+            <tr><td><strong>Total Deductions</strong></td><td><strong>₱ 5,200.00</strong></td></tr>
+          </tfoot>
+        </table>
+      </div>
+
+      <!-- Net Pay -->
+      <div class="netpay">
+        <p><strong>Net Pay for the month: </strong> <span>₱ 47,800.00</span></p>
+      </div>
+    </div>
+  </main>
+  <script>
+document.getElementById("payslipPeriod").addEventListener("change", function() {
+  const title = document.getElementById("payslipTitle");
+  const period = this.value;
+
+  // Update the title dynamically
+  title.textContent = "Payslip for the month of " + period;
+
+  // Example data for each payslip period
+  const payslipData = {
+    "October 1–15 2025": {
+      earnings: [
+        ["Basic Salary", "₱ 45,000.00"],
+        ["Overtime", "₱ 5,000.00"]
+      ],
+      deductions: [
+        ["SSS", "₱ 1,200.00"],
+        ["PhilHealth", "₱ 800.00"],
+        ["Pag-IBIG", "₱ 200.00"],
+        ["Late", "₱ 500.00"],
+        ["Undertime", "₱ 1,000.00"],
+        ["Tax", "₱ 3,000.00"]
+      ],
+      netPay: "₱ 47,800.00"
+    },
+
+    "October 16–31 2025": {
+      earnings: [
+        ["Basic Salary", "₱ 45,000.00"],
+        ["Overtime", "₱ 3,000.00"]
+      ],
+      deductions: [
+        ["SSS", "₱ 1,200.00"],
+        ["PhilHealth", "₱ 800.00"],
+        ["Pag-IBIG", "₱ 200.00"],
+        ["Late", "₱ 300.00"],
+        ["Undertime", "₱ 1,000.00"],
+        ["Tax", "₱ 2,800.00"]
+      ],
+      netPay: "₱ 42,700.00"
+    }
+  };
+
+  const data = payslipData[period];
+
+  // Update Earnings table
+  const earningsTable = document.querySelectorAll(".tables table")[0].querySelector("tbody");
+  earningsTable.innerHTML = data.earnings.map(row => `<tr><td>${row[0]}</td><td>${row[1]}</td></tr>`).join("");
+  document.querySelectorAll(".tables table")[0].querySelector("tfoot td:last-child").innerHTML = 
+    `<strong>${data.earnings.reduce((sum, row) => sum + Number(row[1].replace(/[₱, ]/g, '')), 0).toLocaleString('en-PH', { style: 'currency', currency: 'PHP' })}</strong>`;
+
+  // Update Deductions table
+  const deductionsTable = document.querySelectorAll(".tables table")[1].querySelector("tbody");
+  deductionsTable.innerHTML = data.deductions.map(row => `<tr><td>${row[0]}</td><td>${row[1]}</td></tr>`).join("");
+  document.querySelectorAll(".tables table")[1].querySelector("tfoot td:last-child").innerHTML = 
+    `<strong>${data.deductions.reduce((sum, row) => sum + Number(row[1].replace(/[₱, ]/g, '')), 0).toLocaleString('en-PH', { style: 'currency', currency: 'PHP' })}</strong>`;
+
+  // Update Net Pay
+  document.querySelector(".netpay span").textContent = data.netPay;
+});
+</script>
+
+</body>
+</html>
