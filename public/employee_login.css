@@ -1,0 +1,233 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: 'Segoe UI', sans-serif;
+}
+
+/* Body */
+body {
+  background-color: #0b1221;
+  color: #fff;
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  background-image: radial-gradient(circle at center, rgba(255, 255, 255, 0.08) 1px, transparent 2px);
+  background-size: 20px 20px;
+  position: relative;
+}
+
+/* Header */
+.header {
+  position: absolute;
+  top: 25px;
+  left: 40px;
+  display: flex;
+  align-items: center;
+}
+
+.logo-section {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.logo {
+  width: 120px;
+  height: 120px;
+  object-fit: contain;
+}
+
+.logo-name {
+  font-size: 28px;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.logo-name .blue {
+  color: #1e90ff;
+}
+
+/* Login Container */
+.login-container {
+  text-align: center;
+  width: 100%;
+  max-width: 400px;
+  padding: 40px 20px;
+}
+
+/* Login Title */
+.login-title {
+  font-size: 30px;
+  font-weight: 700;
+  margin-bottom: 20px;
+}
+
+/* Inputs */
+.login-form input {
+  width: 100%;
+  padding: 12px;
+  margin: 10px 0;
+  border-radius: 8px;
+  border: none;
+  background-color: #2b2f3a;
+  color: #fff;
+  font-size: 15px;
+}
+
+.login-form input::placeholder {
+  color: #bbb;
+}
+
+/* Button */
+.login-btn {
+  width: 100%;
+  background-color: #204ecf;
+  border: none;
+  padding: 12px;
+  border-radius: 8px;
+  color: white;
+  font-size: 16px;
+  margin-top: 8px;
+  cursor: pointer;
+  transition: background 0.3s;
+}
+
+.login-btn:hover {
+  background-color: #1b3ea7;
+}
+
+/* Forgot Password */
+.forgot-password {
+  display: block;
+  color: #1e90ff;
+  margin-top: 10px;
+  font-size: 14px;
+  text-decoration: none;
+}
+
+.forgot-password:hover {
+  text-decoration: underline;
+}
+
+.password-wrapper {
+  position: relative;
+  width: 100%;
+}
+
+.password-wrapper input {
+  width: 100%;
+  padding: 10px 40px 10px 10px;
+  font-size: 16px;
+}
+
+.toggle-password {
+  position: absolute;
+  right: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0;
+}
+
+.toggle-password img {
+  width: 22px;
+  height: 22px;
+  opacity: 0.7;
+  transition: opacity 0.2s;
+}
+
+.toggle-password img:hover {
+  opacity: 1;
+}
+
+
+
+/* Footer */
+footer {
+  position: absolute;
+  bottom: 20px;
+  width: 100%;
+  text-align: center;
+  font-size: 12px;
+  color: #999;
+}
+
+footer a {
+  color: #1e90ff;
+  text-decoration: none;
+}
+
+footer a:hover {
+  text-decoration: underline;
+}
+
+/* Responsive Design */
+
+/* Tablets */
+@media (max-width: 900px) {
+  .profile-content {
+    flex-direction: column;
+  }
+
+  .profile-left {
+    display: flex;
+    align-items: center;
+    gap: 25px;
+  }
+
+  .employee-info p {
+    margin-bottom: 4px;
+  }
+
+  .profile-pic {
+    flex-shrink: 0;
+  }
+
+  .profile-right {
+    width: 100%;
+  }
+}
+
+/* Mobile */
+@media (max-width: 600px) {
+  .header {
+    padding: 15px 20px;
+    text-align: center;
+  }
+
+  .nav {
+    justify-content: center;
+    margin-top: 10px;
+  }
+
+  .profile-card {
+    padding: 20px;
+  }
+
+  .profile-pic {
+    width: 100px;
+    height: 100px;
+  }
+
+  .box.small,
+  .box.large {
+    height: 100px;
+  }
+
+  .profile-card h2 {
+    text-align: center;
+    font-size: 1.1rem;
+  }
+
+  .profile-content {
+    align-items: center;
+  }
+}
+
