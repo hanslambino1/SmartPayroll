@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Settings - Change Password</title>
+  <link rel="stylesheet" href="settings.css">
+</head>
+<body>
+  <div class="container">
+    <!-- Sidebar -->
+    <aside class="sidebar">
+      <div class="logo">
+        <img src="SPlogo.png" alt="Logo">
+      </div>
+      <ul class="nav">
+        <li><a href="dashboard.html"><img src="Analytics.png" class="nav-icon"><span>Dashboard</span></a></li>
+        <li><a href="employee.html"><img src="People.png" class="nav-icon"><span>Employees</span></a></li>
+        <li><a href="DTR.html"><img src="Schedule.png" class="nav-icon"><span>Daily Time Record</span></a></li>
+        <li><a href="payroll.html"><img src="Payroll.png" class="nav-icon"><span>Payroll</span></a></li>
+        <li><a href="reports.html"><img src="Graph Report.png" class="nav-icon"><span>Reports</span></a></li>
+        <li class="active"><a href="settings.html"><img src="Settings.png" class="nav-icon"><span>Settings</span></a></li>
+      </ul>
+
+      <div class="logout-container">
+        <button id="logoutBtn" class="logout-btn">
+          <img src="logout.png" class="icon"/>Logout
+        </button>
+      </div>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="main-content">
+      <h1>Change Password</h1>
+      <div class="card">
+        <form id="passwordForm">
+          <!-- Current Password -->
+          <div class="form-group">
+            <label for="currentPassword">Current Password</label>
+            <div class="password-wrapper">
+              <input type="password" id="currentPassword" placeholder="Enter current password" required>
+              <button type="button" class="toggle-password" data-target="currentPassword">
+                <img src="eye-crossed.png" alt="Show Password" class="eye-icon">
+              </button>
+            </div>
+          </div>
+
+          <!-- New Password -->
+          <div class="form-group">
+            <label for="newPassword">New Password</label>
+            <div class="password-wrapper">
+              <input type="password" id="newPassword" placeholder="Enter new password" required>
+              <button type="button" class="toggle-password" data-target="newPassword">
+                <img src="eye-crossed.png" alt="Show Password" class="eye-icon">
+              </button>
+            </div>
+          </div>
+
+          <!-- Confirm Password -->
+          <div class="form-group">
+            <label for="confirmPassword">Confirm New Password</label>
+            <div class="password-wrapper">
+              <input type="password" id="confirmPassword" placeholder="Re-enter new password" required>
+              <button type="button" class="toggle-password" data-target="confirmPassword">
+                <img src="eye-crossed.png" alt="Show Password" class="eye-icon">
+              </button>
+            </div>
+          </div>
+
+          <button type="submit" class="save-btn">Update Password</button>
+
+          <!-- Success Modal -->
+          <div id="successModal" class="modal">
+            <div class="modal-content">
+              <h2>Password Updated!</h2>
+              <p>Your password has been successfully changed.</p>
+              <button id="closeModal" class="close-btn">OK</button>
+            </div>
+          </div>
+        </form>
+      </div>
+    </main>
+  </div>
+
+  <script>
+    // Show/Hide Password Toggle (copied from login)
+    const toggleButtons = document.querySelectorAll(".toggle-password");
+    toggleButtons.forEach(btn => {
+      btn.addEventListener("click", () => {
+        const targetId = btn.getAttribute("data-target");
+        const input = document.getElementById(targetId);
+        const img = btn.querySelector("img");
+        const isHidden = input.type === "password";
+
+        input.type = isHidden ? "text" : "password";
+        img.src = isHidden ? "eye.png" : "eye-crossed.png";
+        img.alt = isHidden ? "Hide Password" : "Show Password";
+      });
+    });
+
+    // Password Update + Validation
+    const form = document.getElementById("passwordForm");
+    const modal = document.getElementById("successModal");
+    const closeModal = document.getElementById("closeModal");
+
+    form.addEventListener("submit", (e) => {
+      e.preventDefault();
+
+      const newPass = document.getElementById("newPassword").value.trim();
+      const confirmPass = document.getElementById("confirmPassword").value.trim();
+
+      const oldError = document.querySelector(".error-message");
+      if (oldError) oldError.remove();
+
+      if (newPass !== confirmPass) {
+        const errorMsg = document.createElement("p");
+        errorMsg.textContent = "❌ New Password and Confirm Password do not match.";
+        errorMsg.classList.add("error-message");
+        errorMsg.style.color = "red";
+        errorMsg.style.marginTop = "8px";
+        errorMsg.style.fontSize = "14px";
+        form.querySelector("#confirmPassword").parentNode.appendChild(errorMsg);
+        return;
+      }
+
+      modal.style.display = "flex";
+    });
+
+    closeModal.addEventListener("click", () => {
+      modal.style.display = "none";
+      form.reset();
+    });
+
+    window.addEventListener("click", (e) => {
+      if (e.target === modal) modal.style.display = "none";
+    });
+  </script>
+</body>
+</html>
