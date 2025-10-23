@@ -102,5 +102,15 @@ router.get("/overtime/employees", (req, res) => {
   });
 });
 
+// Payroll Processed Count (for Dashboard)
+router.get("/payroll/processed", (req, res) => {
+  const query = `SELECT COUNT(*) AS totalProcessed FROM payroll;`;
+  db.query(query, (err, results) => {
+    if (err) return res.status(500).json({ error: err.message });
+    res.json({ totalProcessed: results[0].totalProcessed });
+  });
+});
+
+
 
 module.exports = router;
