@@ -4,6 +4,8 @@ const bodyParser = require("body-parser");
 const session = require("express-session");
 const bcrypt = require("bcryptjs");
 const mysql = require("mysql2");
+const payrollRoutes = require("./payroll.js");
+const reportsRoutes = require("./reports.js");
 
 const app = express();
 
@@ -11,6 +13,10 @@ const app = express();
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(express.json());
 app.use(express.static(path.join(__dirname, "public")));
+app.use("/api/payroll", payrollRoutes);
+app.use("/api/reports", reportsRoutes);
+app.use(express.static(path.join(__dirname, "node_modules")));
+
 
 app.use(
   session({
