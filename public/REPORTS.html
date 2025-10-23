@@ -94,8 +94,8 @@ document.addEventListener("DOMContentLoaded", async () => {
   // Fetch reports
   const reports = [
     { type: "tardiness", url: "/api/reports/tardiness" },
-    { type: "undertime", url: "/api/reports/undertime" },
-    { type: "overtime", url: "/api/reports/overtime" }
+    { type: "undertime", url: "/api/reports/undertime/employees" },
+    { type: "overtime", url: "/api/reports/overtime/employees" }
   ];
 
   for (let r of reports) {
