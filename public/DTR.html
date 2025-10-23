@@ -47,7 +47,7 @@
         <select id="department">
           <option value="all">All</option>
           <option value="Human Resources">Human Resources</option>
-          <option value="Information Technology">Information Technology</option>
+          <option value="Information Technology (IT)">Information Technology (IT)</option>
           <option value="Finance">Finance</option>
         </select>
         <button id="filterBtn">Load</button>
@@ -55,9 +55,8 @@
 
       <!-- Search -->
       <div class="search-bar">
-        <input type="text" placeholder="Last Name | First Name | Middle Name" />
-        <button class="search-btn">🔍</button>
-      </div>
+    <input type="text" id="searchInput" placeholder="Last Name | First Name | Middle Name" />
+  </div>
 
       <div class="dtr-container">
         <div class="employee-list">
@@ -125,7 +124,6 @@ document.addEventListener("DOMContentLoaded", () => {
 
 
   // 🔍 Search employees by name
-  searchBtn.addEventListener("click", handleSearch);
   searchInput.addEventListener("keyup", (e) => {
     if (e.key === "Enter") handleSearch();
     else handleSearch(); // live filter
@@ -208,16 +206,21 @@ document.addEventListener("DOMContentLoaded", () => {
         });
       };
 
-      dtrTableBody.innerHTML = dtr.records.map(r => `
-        <tr data-id="${r.id}">
+      dtrTableBody.innerHTML = dtr.records.map(r => {
+        const { late, undertime, overtime } = calculateDTR(r.time_in, r.time_out);
+
+        return `
+          <tr data-id="${r.id}">
           <td>${formatDate(r.date)}</td>
           <td>${formatTime(r.time_in)}</td>
           <td>${formatTime(r.time_out)}</td>
-          <td contenteditable="true" class="editable undertime">${r.undertime || 0}</td>
-          <td contenteditable="true" class="editable overtime">${r.overtime || 0}</td>
-          <td contenteditable="true" class="editable late">${r.late || 0}</td>
+          <td contenteditable="true" class="editable undertime">${undertime}</td>
+          <td contenteditable="true" class="editable overtime">${overtime}</td>
+          <td contenteditable="true" class="editable late">${late}</td>
         </tr>
-      `).join("");
+      `;
+    }).join("");
+
 
       document.querySelectorAll(".editable").forEach(cell => {
         cell.addEventListener("blur", async (e) => {
@@ -270,7 +273,7 @@ document.addEventListener("DOMContentLoaded", () => {
   });
 });
 
-    // Calculate Late, Undertime, Overtime in minutes
+// Calculate Late, Undertime, Overtime in minutes
 function calculateDTR(timeIn, timeOut, workStart="08:00:00", workEnd="16:00:00") {
   const msInMinute = 60000;
 
@@ -285,8 +288,7 @@ function calculateDTR(timeIn, timeOut, workStart="08:00:00", workEnd="16:00:00")
 
   return { late, undertime, overtime };
 }
+
 </script>
 </body>
 </html>
-
-

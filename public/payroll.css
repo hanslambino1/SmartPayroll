@@ -8,7 +8,7 @@
 
 html, body {
   height: 100%;
-  overflow: hidden; 
+  overflow: auto; 
 }
 
 /* Layout */
@@ -125,13 +125,13 @@ html, body {
   flex: 1;
   padding: 30px;
   background: #e5e7eb;
-  overflow-y: auto;
-  opacity: 0;
-  transform: translateY(10px);
-  transition: opacity 0.5s ease, transform 0.5s ease;
-  pointer-events: none;
+  overflow-x: auto; 
+  overflow-y: auto; 
+  opacity: 1; 
+  transform: translateY(0);
+  pointer-events: auto;
   margin-left: 250px; 
-  height: 100vh; 
+  min-height: 100vh; 
 }
 
 .main.show {
@@ -175,7 +175,6 @@ html, body {
 }
 
 
-
 /* Content */
 .content {
   flex: 1;
@@ -191,10 +190,12 @@ html, body {
 
 /* Controls */
 .controls {
+  margin-top: 10px;
   display: flex;
-  justify-content: space-between;
+  gap: 10px;
   align-items: center;
   margin-bottom: 15px;
+  font-weight: 600;
 }
 
 .controls select {
@@ -205,24 +206,53 @@ html, body {
 }
 
 .controls .compute {
-  background: #1e3aaf;
-  color: white;
-  padding: 8px 18px;
+  color: rgb(0, 0, 0);
+  padding: 6px 10px;
   border: none;
-  border-radius: 20px;
+  border-radius: 6px;
   font-size: 14px;
   cursor: pointer;
+  border: 1px solid #ccc;
+  transition: 0.3s;
 }
 
 .controls .compute:hover {
-  background: #142a80;
+  background: #dbdbdb;
+  transform: scale(1.05);
+}
+
+.save{
+  background-color: #0D2A4B;
+  color: white;
+  padding: 6px 10px;
+  border-radius: 6px;
+  border: 1px solid #ccc;
+  transition: 0.3s;
+}
+
+.save:hover {
+  background: #326FC5;
+  transform: scale(1.05);
+}
+
+.history-btn{
+  padding: 6px 10px;
+  border-radius: 6px;
+  border: 1px solid #ccc;
+  transition: 0.3s;
+  margin-inline-start: auto;
+}
+
+.history-btn:hover {
+  background: #dbdbdb;
+  transform: scale(1.05);
 }
 
 /* Table */
 .table-container {
   background: white;
   border-radius: 10px;
-  overflow: hidden;
+  overflow-x: auto;
   box-shadow: 0 2px 6px rgba(0,0,0,0.1);
 }
 
@@ -389,4 +419,70 @@ tbody tr:last-child td {
   .card {
     padding: 15px;
   }
+}
+
+/* Modal Styles */
+.modal {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.5);
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+.modal-content {
+  background: white;
+  border-radius: 15px;
+  width: 400px;
+  max-width: 90%;
+  overflow: hidden;
+  animation: fadeIn 0.3s ease;
+}
+
+.modal-header {
+  background: #0D2A4B;
+  color: white;
+  padding: 12px 16px;
+}
+
+.modal-body {
+  padding: 20px;
+  text-align: center;
+  font-size: 16px;
+  color: #333;
+}
+
+.modal-footer {
+  padding: 10px;
+  text-align: center;
+}
+
+.modal-footer button {
+  padding: 8px 16px;
+  background: #0D2A4B;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+.modal-footer button:hover {
+  background: #103864;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: scale(0.9); }
+  to { opacity: 1; transform: scale(1); }
+}
+
+.table-container h2 {
+  margin: 20px 0 10px;
+  color: #0D2A4B;
+  font-size: 18px;
+}
+
+.table-container table {
+  margin-bottom: 30px;
 }

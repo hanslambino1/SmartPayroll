@@ -8,131 +8,296 @@
   <link rel="stylesheet" href="payroll.css" />
 </head>
 <body>
-  <div class="container">
-    <!-- Sidebar -->
-    <aside class="sidebar">
-      <div class="sidebar-header">
-        <img src="SPlogo.png" alt="Logo" class="logo" />
-      </div>
-      <ul class="menu">
-        <li><a href="DASHBOARD.html"><img src="bar-graph.png" class="icon" /> Dashboard</a></li>
-        <li><a href="EMPLOYEES.html"><img src="group.png" class="icon" /> Employees</a></li>
-        <li><a href="DTR.html"><img src="timetable.png" class="icon" /> Daily Time Record</a></li>
-        <li class="active"><a href="PAYROLL.html"><img src="user.png" class="icon" /> Payroll</a></li>
-        <li><a href="REPORTS.html"><img src="business-report.png" class="icon" /> Reports</a></li>
-        <li><a href="SETTINGS.html"><img src="gear.png" class="icon" /> Settings</a></li>
-      </ul>
+<div class="container">
+  <!-- Sidebar -->
+  <aside class="sidebar">
+    <div class="sidebar-header">
+      <img src="SPlogo.png" alt="Logo" class="logo" />
+    </div>
+    <ul class="menu">
+      <li><a href="DASHBOARD.html"><img src="bar-graph.png" class="icon" /> Dashboard</a></li>
+      <li><a href="EMPLOYEES.html"><img src="group.png" class="icon" /> Employees</a></li>
+      <li><a href="DTR.html"><img src="timetable.png" class="icon" /> Daily Time Record</a></li>
+      <li class="active"><a href="PAYROLL.html"><img src="user.png" class="icon" /> Payroll</a></li>
+      <li><a href="REPORTS.html"><img src="business-report.png" class="icon" /> Reports</a></li>
+      <li><a href="SETTINGS.html"><img src="gear.png" class="icon" /> Settings</a></li>
+    </ul>
 
-      <div class="logout-container">
-        <button id="logoutBtn" class="logout-btn">
-          <img src="logout.png" class="icon" />Logout
-        </button>
-      </div>
-    </aside>
+    <div class="logout-container">
+      <button id="logoutBtn" class="logout-btn">
+        <img src="logout.png" class="icon" />Logout
+      </button>
+    </div>
+  </aside>
 
-    <!-- Main Content -->
-    <main class="main">
-      <h1>Payroll</h1>
+  <!-- Main Content -->
+  <main class="main">
+    <h1>Payroll</h1>
 
-      <div class="controls">
-        <select id="coverage">
-          <option value="monthly">Monthly</option>
-        </select>
-        <button class="compute" id="computeBtn">Compute</button>
-      </div>
+    <div class="controls">
+      <label>Start Date: <input type="date" id="startDate" /></label>
+      <label>End Date: <input type="date" id="endDate" /></label>
+      <button class="compute" id="computeBtn">Compute</button>
+      <button class="save" id="saveBtn">Save Payroll</button>
+      <button class="history-btn" id="historyBtn">History</button>
+    </div>
 
-      <div class="table-container">
-        <table id="payrollTable">
-          <thead>
-            <tr>
-              <th>Name</th>
-              <th>Position</th>
-              <th>Department</th>
-              <th>Basic Salary</th>
-              <th>Deductions</th>
-              <th>Net Pay</th>
-            </tr>
-          </thead>
-          <tbody id="payrollBody">
-            <!-- Dynamic rows will load here -->
-          </tbody>
-        </table>
-      </div>
-    </main>
+    <div class="table-container">
+      <table id="payrollTable">
+        <thead>
+          <tr>
+            <th>Name</th>
+            <th>Position</th>
+            <th>Department</th>
+            <th>Basic Salary</th>
+            <th>Daily Rate</th>
+            <th>Late (₱)</th>
+            <th>Undertime (₱)</th>
+            <th>Overtime (₱)</th>
+            <th>Total Earnings (₱)</th>
+            <th>SSS (₱)</th>
+            <th>PhilHealth (₱)</th>
+            <th>Pag-IBIG (₱)</th>
+            <th>Net Pay (₱)</th>
+          </tr>
+        </thead>
+        <tbody id="payrollBody"></tbody>
+      </table>
+    </div>
+  </main>
+</div>
+
+<!-- Payroll Modal -->
+<div id="payrollModal" class="modal">
+  <div class="modal-content">
+    <div class="modal-header">
+      <h2>Payroll Status</h2>
+    </div>
+    <div class="modal-body">
+      <p id="modalMessage">Processing...</p>
+    </div>
+    <div class="modal-footer">
+      <button id="closeModal">Close</button>
+    </div>
   </div>
+</div>
 
-  <script>
-    // Smooth transition animation
-    window.addEventListener("DOMContentLoaded", () => {
-      const main = document.querySelector(".main");
-      setTimeout(() => main.classList.add("show"), 50);
 
-      document.querySelectorAll("a").forEach(link => {
-        link.addEventListener("click", e => {
-          e.preventDefault();
-          main.classList.remove("show");
-          main.classList.add("hide");
-          setTimeout(() => (window.location.href = link.href), 500);
-        });
-      });
+<script>
+const DAILY_RATE = 468;       // Default Daily Rate
+const MONTHLY_RATE = 12168;   // Default Basic Salary
+const WORK_HOURS = 8;
 
-      loadEmployees();
+function truncateTo2(num) {
+  return Math.floor(num * 100) / 100;
+}
+
+let employeesData = [];
+
+window.addEventListener("DOMContentLoaded", () => {
+  loadEmployees();
+});
+
+// Logout
+document.getElementById("logoutBtn").addEventListener("click", () => {
+  if (confirm("Are you sure you want to log out?")) {
+    fetch("/logout")
+      .then(() => (window.location.href = "/LOGIN.html"))
+      .catch(() => alert("Error logging out."));
+  }
+});
+
+// Load employee data
+async function loadEmployees() {
+  try {
+    const res = await fetch("/api/employees");
+    const employees = await res.json();
+    employeesData = employees;
+    const tbody = document.getElementById("payrollBody");
+    tbody.innerHTML = "";
+
+    employees.forEach(emp => {
+      const tr = document.createElement("tr");
+      tr.innerHTML = `
+        <td>${emp.name}</td>
+        <td>${emp.position}</td>
+        <td>${emp.dept}</td>
+        <td>₱ <span class="basic">${emp.salary || MONTHLY_RATE}</span></td>
+        <td>₱ <span class="daily">${(emp.salary / 26 || DAILY_RATE).toFixed(2)}</span></td>
+        <td><span class="late">0.00</span></td>
+        <td><span class="undertime">0.00</span></td>
+        <td><span class="ot">0.00</span></td>
+        <td><span class="totalEarnings">0.00</span></td>
+        <td><span class="sss">0.00</span></td>
+        <td><span class="philhealth">0.00</span></td>
+        <td><span class="pagibig">0.00</span></td>
+        <td><span class="net">0.00</span></td>
+      `;
+      tbody.appendChild(tr);
+    });
+  } catch (err) {
+    console.error(err);
+    alert("Failed to load employees.");
+  }
+}
+
+// Fetch DTR records
+async function fetchDTR(employeeId, coverage) {
+  const res = await fetch(`/api/dtr/${employeeId}?coverage=${coverage}`);
+  const data = await res.json();
+  return data.records;
+}
+
+// Compute Payroll
+document.getElementById("computeBtn").addEventListener("click", async () => {
+  const startDate = document.getElementById("startDate").value;
+  const endDate = document.getElementById("endDate").value;
+
+  if (!startDate || !endDate) {
+    alert("Please select both start and end dates!");
+    return;
+  }
+
+  // Show modal
+  let modal = document.getElementById("payrollModal");
+  if (!modal) {
+    modal = document.createElement("div");
+    modal.id = "payrollModal";
+    modal.className = "modal";
+    modal.innerHTML = `
+      <div class="modal-content">
+        <div class="modal-header"><h2>Payroll Status</h2></div>
+        <div class="modal-body"><p id="modalMessage">Processing...</p></div>
+        <div class="modal-footer"><button id="closeModal">Close</button></div>
+      </div>`;
+    document.body.appendChild(modal);
+  }
+
+  const messageEl = document.getElementById("modalMessage");
+  const closeModal = document.getElementById("closeModal");
+
+  modal.style.display = "flex";
+  closeModal.style.display = "none";
+
+  // Compute coverage string
+  const coverage = `${startDate}_to_${endDate}`;
+
+  for (let i = 0; i < employeesData.length; i++) {
+    const emp = employeesData[i];
+    messageEl.textContent = `Computing payroll for ${emp.name}...`;
+
+    const dtr = await fetchDTR(emp.id, coverage);
+
+    let totalLateMinutes = 0;
+    let totalUndertimeMinutes = 0;
+    let totalOTMinutes = 0;
+    let daysWorked = dtr.length;
+
+    dtr.forEach(record => {
+      totalLateMinutes += record.late || 0;
+      totalUndertimeMinutes += record.undertime || 0;
+      totalOTMinutes += record.overtime || 0;
     });
 
-    // Logout
-    document.getElementById("logoutBtn").addEventListener("click", () => {
-      if (confirm("Are you sure you want to log out?")) {
-        fetch("/logout")
-          .then(() => (window.location.href = "/LOGIN.html"))
-          .catch(() => alert("Error logging out."));
-      }
+    const dailyRate = emp.salary ? emp.salary / 26 : DAILY_RATE;
+    const hourlyRate = dailyRate / WORK_HOURS;
+    const basicSalary = dailyRate * daysWorked;
+
+    const lateDeduction = hourlyRate * (totalLateMinutes / 60);
+    const undertimeDeduction = hourlyRate * (totalUndertimeMinutes / 60);
+    const otPay = (totalOTMinutes / 60) * (hourlyRate * 1.25);
+
+    const totalEarnings = basicSalary + otPay - lateDeduction - undertimeDeduction;
+
+    // Deductions
+    const monthlySalary = emp.salary || MONTHLY_RATE;
+    const sss = 300;
+    const philhealth = monthlySalary * 0.025;
+    const pagibig = monthlySalary * 0.02;
+
+    const netPay = totalEarnings - (sss + philhealth + pagibig);
+
+    // Update table
+    const tr = document.querySelectorAll("#payrollBody tr")[i];
+    tr.querySelector(".late").textContent = truncateTo2(lateDeduction).toFixed(2);
+    tr.querySelector(".undertime").textContent = truncateTo2(undertimeDeduction).toFixed(2);
+    tr.querySelector(".ot").textContent = truncateTo2(otPay).toFixed(2);
+    tr.querySelector(".totalEarnings").textContent = truncateTo2(totalEarnings).toFixed(2);
+    tr.querySelector(".sss").textContent = truncateTo2(sss).toFixed(2);
+    tr.querySelector(".philhealth").textContent = truncateTo2(philhealth).toFixed(2);
+    tr.querySelector(".pagibig").textContent = truncateTo2(pagibig).toFixed(2);
+    tr.querySelector(".net").textContent = truncateTo2(netPay).toFixed(2);
+
+    // ✅ Show per-employee success message
+    messageEl.textContent = `✅ Payroll computation for ${emp.name} completed!`;
+    await new Promise(res => setTimeout(res, 1500));
+  }
+
+  // ✅ Final message
+  messageEl.textContent = "✅ Payroll computation for all employees is complete!";
+  closeModal.style.display = "inline-block";
+  closeModal.onclick = () => (modal.style.display = "none");
+});
+
+
+// Save Payroll
+document.getElementById("saveBtn").addEventListener("click", async () => {
+  const startDate = document.getElementById("startDate").value;
+  const endDate = document.getElementById("endDate").value;
+
+  if (!startDate || !endDate) {
+    alert("Please select coverage dates first!");
+    return;
+  }
+
+  const coverage = `${startDate}_to_${endDate}`;
+  const rows = document.querySelectorAll("#payrollBody tr");
+  const payrollData = [];
+
+  rows.forEach((row, index) => {
+    const emp = employeesData[index];
+    payrollData.push({
+      employee_id: emp.id,
+      employee_name: emp.name,
+      position: emp.position,
+      department: emp.dept,
+      basic_salary: parseFloat(row.querySelector(".basic").textContent),
+      daily_rate: parseFloat(row.querySelector(".daily").textContent),
+      late_deduction: parseFloat(row.querySelector(".late").textContent),
+      undertime_deduction: parseFloat(row.querySelector(".undertime").textContent),
+      overtime_pay: parseFloat(row.querySelector(".ot").textContent),
+      total_earnings: parseFloat(row.querySelector(".totalEarnings").textContent),
+      sss: parseFloat(row.querySelector(".sss").textContent),
+      philhealth: parseFloat(row.querySelector(".philhealth").textContent),
+      pagibig: parseFloat(row.querySelector(".pagibig").textContent),
+      net_pay: parseFloat(row.querySelector(".net").textContent.replace(/[₱, ]/g, "")),
+      coverage
+    });
+  });
+
+  try {
+    const res = await fetch("/api/payroll/save", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(payrollData)
     });
 
-    // Load employees from backend
-    async function loadEmployees() {
-      try {
-        const res = await fetch("/api/employees");
-        const employees = await res.json();
-        const tbody = document.getElementById("payrollBody");
-        tbody.innerHTML = "";
-
-        employees.forEach(emp => {
-          const tr = document.createElement("tr");
-          tr.innerHTML = `
-            <td>${emp.name}</td>
-            <td>${emp.position}</td>
-            <td>${emp.dept}</td>
-            <td>₱ <span class="amount">${emp.salary || "0.00"}</span></td>
-            <td>₱ <span class="amount">0.00</span></td>
-            <td>₱ <span class="amount">${emp.salary || "0.00"}</span></td>
-          `;
-          tbody.appendChild(tr);
-        });
-      } catch (err) {
-        console.error("❌ Error loading employees:", err);
-        alert("Failed to load employee data.");
-      }
+    const result = await res.json();
+    if (result.success) {
+      alert("✅ Payroll saved successfully!");
+    } else {
+      alert("❌ Failed to save payroll: " + result.message);
     }
+  } catch (err) {
+    console.error(err);
+    alert("❌ Error saving payroll to the database.");
+  }
+});
 
-    // Simple payroll compute example
-    document.getElementById("computeBtn").addEventListener("click", () => {
-      const rows = document.querySelectorAll("#payrollBody tr");
-
-      rows.forEach(row => {
-        const salaryCell = row.querySelectorAll(".amount")[0];
-        const deductionCell = row.querySelectorAll(".amount")[1];
-        const netCell = row.querySelectorAll(".amount")[2];
-
-        const salary = parseFloat(salaryCell.textContent.replace(/,/g, "")) || 0;
-        const deductions = Math.round(salary * 0.08); // sample 8% deduction
-        const net = salary - deductions;
-
-        deductionCell.textContent = deductions.toLocaleString("en-PH", { minimumFractionDigits: 2 });
-        netCell.textContent = net.toLocaleString("en-PH", { minimumFractionDigits: 2 });
-      });
-
-      alert("Payroll computed successfully!");
-    });
-  </script>
+// View Payroll History
+document.getElementById("historyBtn").addEventListener("click", () => {
+  window.location.href = "PAYROLL_HISTORY.html";
+});
+</script>
 </body>
 </html>

@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>SmartPayroll | Payroll History</title>
+  <link rel="icon" type="image/png" href="SPlogo.png" />
+  <link rel="stylesheet" href="payroll_history.css" />
+</head>
+<body>
+  <div class="container">
+    <!-- Sidebar -->
+    <aside class="sidebar">
+      <div class="sidebar-header">
+        <img src="SPlogo.png" alt="Logo" class="logo" />
+      </div>
+
+      <ul class="menu">
+        <li><a href="DASHBOARD.html"><img src="bar-graph.png" class="icon" /> Dashboard</a></li>
+        <li><a href="EMPLOYEES.html"><img src="group.png" class="icon" /> Employees</a></li>
+        <li><a href="DTR.html"><img src="timetable.png" class="icon" /> Daily Time Record</a></li>
+        <li class="active"><a href="PAYROLL.html"><img src="user.png" class="icon" /> Payroll</a></li>
+        <li><a href="REPORTS.html"><img src="business-report.png" class="icon" /> Reports</a></li>
+        <li><a href="SETTINGS.html"><img src="gear.png" class="icon" /> Settings</a></li>
+      </ul>
+
+      <div class="logout-container">
+        <button class="logout-btn">
+          <img src="logout-icon.png" alt="Logout" class="icon" /> Logout
+        </button>
+      </div>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="main">
+      <div class="content">
+        <h1>Payroll History</h1>
+
+
+        <div class="controls">
+  <div class="search-bar">
+    <input type="text" id="searchInput" placeholder="Last Name | First Name | Middle Name" />
+  </div>
+  <button class="history-btn" id="historyBtn">Payroll</button>
+</div>
+
+  
+
+        <!-- Payroll Table -->
+        <div class="table-container">
+          <table id="historyTable">
+            <thead>
+              <tr>
+                <th>Employee Name</th>
+                <th>Department</th>
+                <th>Coverage</th>
+                <th>Basic Pay</th>
+                <th>Daily Rate</th>
+                <th>Deductions</th>
+                <th>Net Pay</th>
+                <th>Date Generated</th>
+                <th>Action</th>
+              </tr>
+            </thead>
+            <tbody id="historyTableBody">
+              <!-- Data will be dynamically inserted -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <!-- Payslip Modal -->
+  <div id="payslipModal" class="modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2>Payslip Details</h2>
+        <span class="close">&times;</span>
+      </div>
+
+      <div class="modal-body" id="payslipDetails">
+        <!-- Payslip details will be inserted dynamically -->
+      </div>
+
+      <div class="modal-footer">
+        <button class="close-btn">Close</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="payroll_history.js"></script>
+
+  <script>
+    // Close modal
+    const modal = document.getElementById("payslipModal");
+    const closeBtn = document.querySelector(".close");
+    const closeFooterBtn = document.querySelector(".close-btn");
+
+    closeBtn.onclick = () => modal.classList.remove("show");
+    closeFooterBtn.onclick = () => modal.classList.remove("show");
+    window.onclick = (e) => { if (e.target === modal) modal.classList.remove("show"); };
+
+    // Go to Payroll page
+    document.getElementById("historyBtn").addEventListener("click", () => {
+      window.location.href = "PAYROLL.html";
+    });
+
+     // Search Employees
+document.querySelector(".search-btn").addEventListener("click", searchEmployees);
+document.querySelector(".search-bar input").addEventListener("keyup", (e) => {
+  if (e.key === "Enter") searchEmployees();
+});
+
+function searchEmployees() {
+  const query = document.querySelector(".search-bar input").value.toLowerCase().trim();
+  const rows = document.querySelectorAll("#employeesTable tbody tr");
+
+  rows.forEach(row => {
+    const id = row.children[0].textContent.toLowerCase();
+    const name = row.children[1].textContent.toLowerCase();
+    const dept = row.children[2].textContent.toLowerCase();
+    const position = row.children[3].textContent.toLowerCase();
+    const status = row.children[4].textContent.toLowerCase();
+
+    // Show employee if any field matches the query
+    if (
+      id.includes(query) ||
+      name.includes(query) ||
+      dept.includes(query) ||
+      position.includes(query) ||
+      status.includes(query)
+    ) {
+      row.style.display = "";
+    } else {
+      row.style.display = "none";
+    }
+  });
+}
+
+
+  </script>
+</body>
+</html>

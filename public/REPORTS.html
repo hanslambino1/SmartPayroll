@@ -3,56 +3,28 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>SmartPayroll | Dashboard</title>
-  <link rel="icon" type="image/png" href="SPlogo.png">
+  <title>SmartPayroll | Reports</title>
   <link rel="stylesheet" href="reports.css">
 </head>
 <body>
   <div class="container">
-  <!-- Sidebar -->
-  <aside class="sidebar">
-    <div class="sidebar-header">
-      <img src="SPlogo.png" alt="Logo" class="logo">
-    </div>
-    <ul class="menu">
-      <li>
-        <a href="DASHBOARD.html">
-          <img src="bar-graph.png" class="icon"> Dashboard
-        </a>
-      </li>
-      <li>
-        <a href="EMPLOYEES.html">
-          <img src="group.png" class="icon"> Employees
-        </a>
-      </li>
-      <li>
-        <a href="DTR.html">
-          <img src="timetable.png" class="icon"> Daily Time Record
-        </a>
-      </li>
-      <li>
-        <a href="PAYROLL.html">
-          <img src="user.png" class="icon"> Payroll
-        </a>
-      </li>
-      <li class="active">
-        <a href="REPORTS.html">
-          <img src="business-report.png" class="icon"> Reports
-        </a>
-      </li>
-      <li>
-        <a href="SETTINGS.html">
-          <img src="gear.png" class="icon"> Settings
-        </a>
-      </li>
-    </ul>
-
-    <div class="logout-container">
-        <button id="logoutBtn" class="logout-btn">
-          <img src="logout.png" class="icon"/>Logout
-        </button>
+    <!-- Sidebar -->
+    <aside class="sidebar">
+      <div class="sidebar-header">
+        <img src="SPlogo.png" alt="Logo" class="logo">
       </div>
-  </aside>
+      <ul class="menu">
+        <li><a href="DASHBOARD.html"><img src="bar-graph.png" class="icon"> Dashboard</a></li>
+        <li><a href="EMPLOYEES.html"><img src="group.png" class="icon"> Employees</a></li>
+        <li><a href="DTR.html"><img src="timetable.png" class="icon"> Daily Time Record</a></li>
+        <li><a href="PAYROLL.html"><img src="user.png" class="icon"> Payroll</a></li>
+        <li class="active"><a href="REPORTS.html"><img src="business-report.png" class="icon"> Reports</a></li>
+        <li><a href="SETTINGS.html"><img src="gear.png" class="icon"> Settings</a></li>
+      </ul>
+      <div class="logout-container">
+        <button id="logoutBtn" class="logout-btn"><img src="logout.png" class="icon"/>Logout</button>
+      </div>
+    </aside>
 
     <!-- Main Content -->
     <main class="main">
@@ -64,73 +36,114 @@
           <option>Last Month</option>
           <option>This Year</option>
         </select>
-        <button class="generate">Generate</button>
       </div>
 
-      <div class="table-container">
+      <div class="report-box" id="tardiness-box">
+        <h2>Tardiness Report</h2>
         <table>
           <thead>
             <tr>
-              <th>Date</th>
-              <th>Report</th>
-              <th>Status</th>
+              <th>Employee Name</th>
+              <th>Total Late (minutes)</th>
+              <th>Days Late</th>
             </tr>
           </thead>
-          <tbody>
+          <tbody id="tardiness-body">
+            <tr><td colspan="3">Loading...</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="report-box" id="undertime-box">
+        <h2>Undertime Report</h2>
+        <table>
+          <thead>
             <tr>
-              <td>2025-08-31</td>
-              <td>Monthly Payroll Summary</td>
-              <td>Completed</td>
+              <th>Employee Name</th>
+              <th>Total Undertime (minutes)</th>
             </tr>
+          </thead>
+          <tbody id="undertime-body">
+            <tr><td colspan="2">Loading...</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="report-box" id="overtime-box">
+        <h2>Overtime Report</h2>
+        <table>
+          <thead>
             <tr>
-              <td>2025-08-28</td>
-              <td>Employee Deduction Report</td>
-              <td>Completed</td>
+              <th>Employee Name</th>
+              <th>Total Overtime (minutes)</th>
             </tr>
-            <tr>
-              <td>2025-08-15</td>
-              <td>Bi-Monthly Payroll for Aug 1-15</td>
-              <td>Completed</td>
-            </tr>
-            <tr><td colspan="3">&nbsp;</td></tr>
-            <tr><td colspan="3">&nbsp;</td></tr>
+          </thead>
+          <tbody id="overtime-body">
+            <tr><td colspan="2">Loading...</td></tr>
           </tbody>
         </table>
       </div>
     </main>
   </div>
 
-  <script>
-  window.addEventListener("DOMContentLoaded", () => {
-    const main = document.querySelector(".main");
+<script>
+document.addEventListener("DOMContentLoaded", async () => {
+  const main = document.querySelector(".main");
+  main.classList.add("show");
 
-    // Fade in when page loads
-    setTimeout(() => {
-      main.classList.add("show");
-    }, 50);
+  // Fetch reports
+  const reports = [
+    { type: "tardiness", url: "/api/reports/tardiness" },
+    { type: "undertime", url: "/api/reports/undertime" },
+    { type: "overtime", url: "/api/reports/overtime" }
+  ];
 
-    // Example for fade-out when leaving page
-    document.querySelectorAll("a").forEach(link => {
-      link.addEventListener("click", e => {
-        e.preventDefault();
-        main.classList.remove("show");
-        main.classList.add("hide");
-        setTimeout(() => {
-          window.location.href = link.href;
-        }, 500); // wait for animation before navigating
-      });
-    });
-  });
-
-  document.getElementById("logoutBtn").addEventListener("click", () => {
-    if (confirm("Are you sure you want to log out?")) {
-      fetch("/logout")
-        .then(() => window.location.href = "/LOGIN.html")
-        .catch(err => alert("Error logging out. Please try again."));
+  for (let r of reports) {
+    try {
+      const res = await fetch(r.url);
+      if (!res.ok) throw new Error("Failed to fetch " + r.type);
+      const data = await res.json();
+      populateTable(r.type, data);
+    } catch (err) {
+      console.error(err);
+      const tbody = document.getElementById(`${r.type}-body`);
+      if (tbody) tbody.innerHTML = `<tr><td colspan="3">Error loading data</td></tr>`;
     }
-  });
+  }
+});
+
+
+function populateTable(type, data) {
+  const tbody = document.getElementById(`${type}-body`);
+  if (!tbody) return;
+
+  tbody.innerHTML = data.map(row => {
+    if (type === "tardiness") {
+      return `<tr>
+        <td>${row.name}</td>
+        <td>${row.totalLate || 0}</td>
+        <td>${row.lateDays || 0}</td>
+      </tr>`;
+    } else if (type === "undertime") {
+      return `<tr>
+        <td>${row.name}</td>
+        <td>${row.totalUndertime || 0}</td>
+      </tr>`;
+    } else {
+      return `<tr>
+        <td>${row.name}</td>
+        <td>${row.totalOvertime || 0}</td>
+      </tr>`;
+    }
+  }).join("");
+}
+
+// Logout
+document.getElementById("logoutBtn").addEventListener("click", () => {
+  if (confirm("Are you sure you want to log out?")) {
+    fetch("/logout").then(() => window.location.href="/LOGIN.html");
+  }
+});
 </script>
-
-
 </body>
 </html>

@@ -28,13 +28,12 @@
     <main class="main show">
       <h1>Resigned Employees</h1>
       <!-- Search Bar -->
-      <div class="search-bar">
-        <input type="text" placeholder="Last Name | First Name | Middle Name" />
-        <button class="search-btn">🔍</button>
-      </div>
-
-      <!-- Resigned Label -->
-      <div class="active-label" id="activedBtn">Active Employees</div>
+      <div class="controls">
+  <div class="active-label" id="activeBtn">Active Employees</div>
+  <div class="search-bar">
+    <input type="text" id="searchInput" placeholder="Last Name | First Name | Middle Name" />
+  </div>
+</div>
 
       <!-- Employees Table -->
       <div class="table-container">
@@ -288,41 +287,42 @@ document.addEventListener("click", (e) => {
 
 
 // Back to active employees page
-document.getElementById("activedBtn").addEventListener("click", () => {
+document.getElementById("activeBtn").addEventListener("click", () => {
   window.location.href = "EMPLOYEES.html";
 });
 
+
 // Search Employees
-document.querySelector(".search-btn").addEventListener("click", searchEmployees);
-document.querySelector(".search-bar input").addEventListener("keyup", (e) => {
-  if (e.key === "Enter") searchEmployees();
+const searchInput = document.getElementById("searchInput");
+
+searchInput.addEventListener("keyup", (e) => {
+  if (e.key === "Enter") {
+    const query = searchInput.value.toLowerCase().trim();
+    const rows = document.querySelectorAll("#employeesTable tbody tr");
+
+    rows.forEach(row => {
+      const id = row.children[0].textContent.toLowerCase();
+      const name = row.children[1].textContent.toLowerCase();
+      const dept = row.children[2].textContent.toLowerCase();
+      const position = row.children[3].textContent.toLowerCase();
+      const status = row.children[4].textContent.toLowerCase();
+
+      // Match if any field includes the search term
+      if (
+        id.includes(query) ||
+        name.includes(query) ||
+        dept.includes(query) ||
+        position.includes(query) ||
+        status.includes(query)
+      ) {
+        row.style.display = "";
+      } else {
+        row.style.display = "none";
+      }
+    });
+  }
 });
 
-function searchEmployees() {
-  const query = document.querySelector(".search-bar input").value.toLowerCase().trim();
-  const rows = document.querySelectorAll("#employeesTable tbody tr");
-
-  rows.forEach(row => {
-    const id = row.children[0].textContent.toLowerCase();
-    const name = row.children[1].textContent.toLowerCase();
-    const dept = row.children[2].textContent.toLowerCase();
-    const position = row.children[3].textContent.toLowerCase();
-    const status = row.children[4].textContent.toLowerCase();
-
-    // Show employee if any field matches the query
-    if (
-      id.includes(query) ||
-      name.includes(query) ||
-      dept.includes(query) ||
-      position.includes(query) ||
-      status.includes(query)
-    ) {
-      row.style.display = "";
-    } else {
-      row.style.display = "none";
-    }
-  });
-}
 
 
 // Handle Edit button click for Resigned Employees
@@ -400,10 +400,11 @@ document.getElementById("editEmployeeForm").addEventListener("submit", async (e)
   }
 });
 
-// Back to active employees page    
-  document.getElementById("activedBtn").addEventListener("click", () => {
-    window.location.href = "EMPLOYEES.html"; 
-  });
+// Back to active employees page
+document.getElementById("activeBtn").addEventListener("click", () => {
+  window.location.href = "EMPLOYEES.html";
+});
+
 </script>
 </body>
 </html>

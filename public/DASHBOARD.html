@@ -6,10 +6,10 @@
   <title>SmartPayroll | Dashboard</title>
   <link rel="icon" type="image/png" href="SPlogo.png">
   <link rel="stylesheet" href="dashboard.css">
-    <script src="script.js" defer></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body>
-  <div class="container">
+<div class="container">
   <!-- Sidebar -->
   <aside class="sidebar">
     <div class="sidebar-header">
@@ -47,31 +47,47 @@
         </a>
       </li>
     </ul>
-
     <div class="logout-container">
       <button id="logoutBtn" class="logout-btn">
-      <img src="logout.png" class="icon"/>Logout
-    </button>
+        <img src="logout.png" class="icon"/>Logout
+      </button>
     </div>
   </aside>
 
-    <!-- Main Content -->
-    <main class="main">
-      <h1>Dashboard</h1>
+  <!-- Main Content -->
+  <main class="main">
+    <h1>Dashboard</h1>
 
-      <div class="cards">
-        <div class="card">
-          <h3><img src="groupb.png" class="icon"> Total employees</h3>
-          <p class="value" id="employeeCount">0</p>
-        </div>
-
-        <div class="card">
-          <h3>Payroll processed</h3>
-          <p class="value">0</p>
-        </div>
+    <div class="cards">
+      <div class="card">
+        <h3><img src="groupb.png" class="icon"> Total Employees</h3>
+        <p class="value" id="employeeCount">0</p>
       </div>
-    </main>
-  </div>
+
+      <div class="card">
+        <h3>Payroll Processed</h3>
+        <p class="value" id="payrollCount">0</p>
+      </div>
+
+      <!-- Added new charts -->
+      <div class="card" style="width:100%; max-width:600px;">
+        <h3>Tardiness (Late Minutes)</h3>
+        <canvas id="tardinessChart"></canvas>
+      </div>
+
+      <div class="card" style="width:100%; max-width:600px;">
+        <h3>Overtime Trend</h3>
+        <canvas id="overtimeChart"></canvas>
+      </div>
+
+      <div class="card" style="width:100%; max-width:600px;">
+        <h3>Undertime Trend</h3>
+        <canvas id="undertimeChart"></canvas>
+      </div>
+
+    </div>
+  </main>
+</div>
 
 <!-- Logout Confirmation Modal -->
 <div id="logoutModal" class="modal">
@@ -90,12 +106,9 @@
   </div>
 </div>
 
-
-
 <script>
 window.addEventListener("DOMContentLoaded", () => {
-
-  // Get user info (fix)
+  // Fake data for dashboard
   fetch("/api/user")
     .then(res => res.json())
     .then(user => {
@@ -104,49 +117,35 @@ window.addEventListener("DOMContentLoaded", () => {
     })
     .catch(() => console.warn("User info not found"));
 
-  // Get employee count (fix)
   fetch("/api/employees/count")
     .then(res => res.json())
     .then(data => {
-      console.log("Employee count:", data); // debug line
-      document.getElementById("employeeCount").textContent = data.total;
+      document.getElementById("employeeCount").textContent = data.total || 0;
+      document.getElementById("payrollCount").textContent = 3; // fake number
     })
     .catch(err => console.error("Error fetching employee count:", err));
 
   // Fade animations
   const main = document.querySelector(".main");
+  setTimeout(() => main.classList.add("show"), 50);
 
-  // Fade in when page loads
-  setTimeout(() => {
-    main.classList.add("show");
-  }, 50);
-
-  // Fade out when leaving page
   document.querySelectorAll("a").forEach(link => {
     link.addEventListener("click", e => {
       e.preventDefault();
       main.classList.remove("show");
       main.classList.add("hide");
-      setTimeout(() => {
-        window.location.href = link.href;
-      }, 500); 
+      setTimeout(() => window.location.href = link.href, 500); 
     });
   });
 
- // ===== LOGOUT MODAL =====
+  // Logout modal
   const logoutBtn = document.getElementById("logoutBtn");
   const logoutModal = document.getElementById("logoutModal");
   const confirmLogout = document.getElementById("confirmLogout");
   const cancelLogout = document.getElementById("cancelLogout");
 
-  logoutBtn.addEventListener("click", () => {
-    logoutModal.style.display = "flex";
-  });
-
-  cancelLogout.addEventListener("click", () => {
-    logoutModal.style.display = "none";
-  });
-
+  logoutBtn.addEventListener("click", () => logoutModal.style.display = "flex");
+  cancelLogout.addEventListener("click", () => logoutModal.style.display = "none");
   confirmLogout.addEventListener("click", () => {
     fetch("/logout")
       .then(() => {
@@ -155,12 +154,76 @@ window.addEventListener("DOMContentLoaded", () => {
       })
       .catch(() => alert("⚠️ Error logging out. Please try again."));
   });
+  window.addEventListener("click", e => { if(e.target === logoutModal) logoutModal.style.display="none"; });
 
-  // Close modal when clicking outside
-  window.addEventListener("click", e => {
-    if (e.target === logoutModal) logoutModal.style.display = "none";
+
+  
   });
-});
+
+  // ===== TARDINESS (Bar Chart) =====
+  const tardinessCtx = document.getElementById('tardinessChart').getContext('2d');
+  new Chart(tardinessCtx, {
+    type: 'bar',
+    data: {
+      labels: ['John', 'Adriane', 'Marko'],
+      datasets: [{
+        label: 'Late Minutes (Oct 1–15)',
+        data: [35, 10, 22],
+        backgroundColor: '#FF6B6B',
+        borderRadius: 5
+      }]
+    },
+    options: {
+      responsive: true,
+      plugins: { legend: { display: true, position: 'top' } },
+      scales: { y: { beginAtZero: true, title: { display: true, text: 'Minutes' } } }
+    }
+  });
+
+  // ===== OVERTIME (Line Chart) =====
+  const overtimeCtx = document.getElementById('overtimeChart').getContext('2d');
+  new Chart(overtimeCtx, {
+    type: 'line',
+    data: {
+      labels: ['Oct 1', 'Oct 2', 'Oct 3', 'Oct 4', 'Oct 5', 'Oct 6'],
+      datasets: [{
+        label: 'Total Overtime (minutes)',
+        data: [15, 20, 25, 10, 30, 18],
+        fill: false,
+        borderColor: '#2ECC71',
+        tension: 0.3
+      }]
+    },
+    options: {
+      responsive: true,
+      plugins: { legend: { display: true, position: 'top' } },
+      scales: { y: { beginAtZero: true, title: { display: true, text: 'Minutes' } } }
+    }
+  });
+
+  // ===== UNDERTIME (Line Chart) =====
+  const undertimeCtx = document.getElementById('undertimeChart').getContext('2d');
+  new Chart(undertimeCtx, {
+    type: 'line',
+    data: {
+      labels: ['Oct 1', 'Oct 2', 'Oct 3', 'Oct 4', 'Oct 5', 'Oct 6'],
+      datasets: [{
+        label: 'Total Undertime (minutes)',
+        data: [5, 10, 0, 12, 8, 6],
+        fill: false,
+        borderColor: '#F4B400',
+        tension: 0.3
+      }]
+    },
+    options: {
+      responsive: true,
+      plugins: { legend: { display: true, position: 'top' } },
+      scales: { y: { beginAtZero: true, title: { display: true, text: 'Minutes' } } }
+    }
+  });
+
+
+
 </script>
 </body>
 </html>

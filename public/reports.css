@@ -390,3 +390,33 @@ thead th:last-child {
     padding: 15px;
   }
 }
+
+.report-box {
+  background: #fff;
+  padding: 20px;
+  border-radius: 10px;
+  margin-bottom: 25px;
+  box-shadow: 0 3px 10px rgba(0,0,0,0.1);
+}
+
+.report-box h2 {
+  margin-bottom: 15px;
+  font-size: 20px;
+  color: #1e3aaf;
+}
+
+.report-box table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.report-box th, .report-box td {
+  padding: 12px;
+  border-bottom: 1px solid #ddd;
+}
+
+.report-box th {
+  background-color: #0D2A4B;
+  color: #fff;
+  border-radius: 5px 5px 0 0;
+}

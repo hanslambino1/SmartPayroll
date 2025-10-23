@@ -3,111 +3,148 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>SmartPayroll | Dashboard</title>
+  <title>SmartPayroll | Settings</title>
   <link rel="icon" type="image/png" href="SPlogo.png">
   <link rel="stylesheet" href="settings.css">
 </head>
 <body>
   <div class="container">
-  <!-- Sidebar -->
-  <aside class="sidebar">
-    <div class="sidebar-header">
-      <img src="SPlogo.png" alt="Logo" class="logo">
-    </div>
-    <ul class="menu">
-      <li>
-        <a href="DASHBOARD.html">
-          <img src="bar-graph.png" class="icon"> Dashboard
-        </a>
-      </li>
-      <li>
-        <a href="EMPLOYEES.html">
-          <img src="group.png" class="icon"> Employees
-        </a>
-      </li>
-      <li>
-        <a href="DTR.html">
-          <img src="timetable.png" class="icon"> Daily Time Record
-        </a>
-      </li>
-      <li>
-        <a href="PAYROLL.html">
-          <img src="user.png" class="icon"> Payroll
-        </a>
-      </li>
-      <li>
-        <a href="REPORTS.html">
-          <img src="business-report.png" class="icon"> Reports
-        </a>
-      </li>
-      <li class="active">
-        <a href="SETTINGS.html">
-          <img src="gear.png" class="icon"> Settings
-        </a>
-      </li>
-    </ul>
+    <!-- Sidebar -->
+    <aside class="sidebar">
+      <div class="sidebar-header">
+        <img src="SPlogo.png" alt="Logo" class="logo">
+      </div>
+      <ul class="menu">
+        <li><a href="DASHBOARD.html"><img src="bar-graph.png" class="icon"> Dashboard</a></li>
+        <li><a href="EMPLOYEES.html"><img src="group.png" class="icon"> Employees</a></li>
+        <li><a href="DTR.html"><img src="timetable.png" class="icon"> Daily Time Record</a></li>
+        <li><a href="PAYROLL.html"><img src="user.png" class="icon"> Payroll</a></li>
+        <li><a href="REPORTS.html"><img src="business-report.png" class="icon"> Reports</a></li>
+        <li class="active"><a href="SETTINGS.html"><img src="gear.png" class="icon"> Settings</a></li>
+      </ul>
 
-    <div class="logout-container">
+      <div class="logout-container">
         <button id="logoutBtn" class="logout-btn">
-          <img src="logout.png" class="icon"/>Logout
+          <img src="logout.png" class="icon" />Logout
         </button>
       </div>
-  </aside>
+    </aside>
 
     <!-- Main Content -->
-    <main class="main">
-       <h1>Settings</h1>
-      <section class="account-settings">
-        <h2>Account</h2>
-        <form>
-          <label for="name">Name</label>
-          <input type="text" id="name" placeholder="Enter your name">
-
-          <label for="email">Email</label>
-          <input type="email" id="email" placeholder="Enter your email">
-
-          <div class="password-row">
-            <input type="password" id="password" placeholder="Password">
-            <button type="button" class="btn-secondary">Change Password</button>
+    <main class="main show">
+      <h1>Change Password</h1>
+      <div class="card">
+        <form id="passwordForm">
+          <!-- Current Password -->
+          <div class="form-group">
+            <label for="currentPassword">Current Password</label>
+            <div class="password-wrapper">
+              <input type="password" id="currentPassword" placeholder="Enter current password" required>
+              <button type="button" class="toggle-password" data-target="currentPassword">
+                <img src="eye-crossed.png" alt="Show Password" class="eye-icon">
+              </button>
+            </div>
           </div>
 
-          <button type="submit" class="btn-primary">Save Changes</button>
+          <!-- New Password -->
+          <div class="form-group">
+            <label for="newPassword">New Password</label>
+            <div class="password-wrapper">
+              <input type="password" id="newPassword" placeholder="Enter new password" required>
+              <button type="button" class="toggle-password" data-target="newPassword">
+                <img src="eye-crossed.png" alt="Show Password" class="eye-icon">
+              </button>
+            </div>
+          </div>
+
+          <!-- Confirm Password -->
+          <div class="form-group">
+            <label for="confirmPassword">Confirm New Password</label>
+            <div class="password-wrapper">
+              <input type="password" id="confirmPassword" placeholder="Re-enter new password" required>
+              <button type="button" class="toggle-password" data-target="confirmPassword">
+                <img src="eye-crossed.png" alt="Show Password" class="eye-icon">
+              </button>
+            </div>
+          </div>
+
+          <button type="submit" class="save-btn">Update Password</button>
+
+          <!-- Success Modal -->
+          <div id="successModal" class="modal">
+            <div class="modal-content">
+              <h2>Password Updated!</h2>
+              <p>Your password has been successfully changed.</p>
+              <button id="closeModal" class="close-btn">OK</button>
+            </div>
+          </div>
         </form>
-      </section>
+      </div>
     </main>
   </div>
 
   <script>
-  window.addEventListener("DOMContentLoaded", () => {
-    const main = document.querySelector(".main");
+    // Fade animation
+    window.addEventListener("DOMContentLoaded", () => {
+      const main = document.querySelector(".main");
+      setTimeout(() => main.classList.add("show"), 50);
+    });
 
-    // Fade in when page loads
-    setTimeout(() => {
-      main.classList.add("show");
-    }, 50);
+    // Logout confirmation
+    document.getElementById("logoutBtn").addEventListener("click", () => {
+      if (confirm("Are you sure you want to log out?")) {
+        fetch("/logout")
+          .then(() => (window.location.href = "/LOGIN.html"))
+          .catch(() => alert("Error logging out. Please try again."));
+      }
+    });
 
-    // Example for fade-out when leaving page
-    document.querySelectorAll("a").forEach(link => {
-      link.addEventListener("click", e => {
-        e.preventDefault();
-        main.classList.remove("show");
-        main.classList.add("hide");
-        setTimeout(() => {
-          window.location.href = link.href;
-        }, 500); // wait for animation before navigating
+    // Toggle password visibility
+    document.querySelectorAll(".toggle-password").forEach(btn => {
+      btn.addEventListener("click", () => {
+        const targetId = btn.getAttribute("data-target");
+        const input = document.getElementById(targetId);
+        const img = btn.querySelector("img");
+        const isHidden = input.type === "password";
+
+        input.type = isHidden ? "text" : "password";
+        img.src = isHidden ? "eye.png" : "eye-crossed.png";
       });
     });
-  });
 
-  document.getElementById("logoutBtn").addEventListener("click", () => {
-    if (confirm("Are you sure you want to log out?")) {
-      fetch("/logout")
-        .then(() => window.location.href = "/LOGIN.html")
-        .catch(err => alert("Error logging out. Please try again."));
-    }
-  });
-</script>
+    // Password Update + Modal
+    const form = document.getElementById("passwordForm");
+    const modal = document.getElementById("successModal");
+    const closeModal = document.getElementById("closeModal");
 
+    form.addEventListener("submit", e => {
+      e.preventDefault();
+      const newPass = document.getElementById("newPassword").value.trim();
+      const confirmPass = document.getElementById("confirmPassword").value.trim();
 
+      document.querySelector(".error-message")?.remove();
+
+      if (newPass !== confirmPass) {
+        const errorMsg = document.createElement("p");
+        errorMsg.textContent = "❌ New Password and Confirm Password do not match.";
+        errorMsg.className = "error-message";
+        errorMsg.style.color = "red";
+        errorMsg.style.marginTop = "8px";
+        form.querySelector("#confirmPassword").parentNode.appendChild(errorMsg);
+        return;
+      }
+
+      modal.style.display = "flex"; // ✅ Show modal properly
+    });
+
+    closeModal.addEventListener("click", () => {
+      modal.style.display = "none";
+      form.reset();
+    });
+
+    window.addEventListener("click", e => {
+      if (e.target === modal) modal.style.display = "none";
+    });
+  </script>
 </body>
 </html>
