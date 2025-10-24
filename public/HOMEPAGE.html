@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Smart Payroll - Home</title>
+    <link rel="stylesheet" href="homepage.css" />
+    <script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script> 
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+
+    <header class="header">
+        <div class="logo-section">
+            <img src="SPlogo.png" alt="Smart Payroll Logo" class="logo" />
+            <h1><strong>Smart</strong> <span class="blue">Payroll</span></h1>
+        </div>
+
+        <nav class="nav">
+            <a href="homepage.html" class="active">Home</a>
+            <span>|</span>
+            <a href="payslip.html">My Payslip</a>
+            <span>|</span>
+            <button class="logout-btn" onclick="logout()">Logout</button>
+        </nav>
+    </header>
+    
+
+    <main class="main-container">
+        <div class="curved-hero-section">
+            <div class="profile-card">
+                <h2>Welcome, Adriane</h2>
+
+                <div class="profile-content">
+                    
+                    <div class="profile-left">
+                        <div class="info-card">
+                            <div class="employee-info">
+                                <p><strong>Name:</strong> Adriane Tuliao</p>
+                                <p><strong>Employee ID:</strong> 123-456</p>
+                                <p><strong>Department:</strong> Information Technology (IT)</p>
+                                <p><strong>Position:</strong> Maintenance Personnel</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="profile-right">
+                        <div class="image-slider-container">
+                            <div class="slider-wrapper">
+                                <div class="slide slide-quote">
+                                    <i class="fas fa-lock lock-icon"></i>
+                                    <h3>Your Privacy is Secured.</h3>
+                                    <p>We use advanced encryption for reliable data protection.</p>
+                                </div>
+                                <div class="slide slide-image">
+                                    <i class="fas fa-hand-holding-usd lock-icon"></i>
+                                    <h3>Total Transparency.</h3>
+                                    <p>Access clear breakdowns of your gross pay, deductions, and net earnings.</p>
+                                </div>
+                                <div class="slide slide-quote">
+                                    <i class="fas fa-shield-alt lock-icon"></i>
+                                    <h3>Always Up-to-Date.</h3>
+                                    <p>Your latest pay information is always available right here.</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <div class="curve-container">
+        <div class="custom-shape-divider-bottom-1761329063">
+            <svg data-name="Layer 1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 120" preserveAspectRatio="none">
+                <path d="M0,0V46.29c47.79,22.2,103.59,32.17,158,28,70.36-5.37,136.33-33.31,206.8-37.5C438.64,32.43,512.34,53.67,583,72.05c69.27,18,138.3,24.88,209.4,13.08,36.15-6,69.85-17.84,104.45-29.34C989.49,25,1113-14.29,1200,52.47V0Z" opacity=".25" class="shape-fill"></path>
+                <path d="M0,0V15.81C13,36.92,27.64,56.86,47.69,72.05,99.41,111.27,165,111,224.58,91.58c31.15-10.15,60.09-26.07,89.67-39.8,40.92-19,84.73-46,130.83-49.67,36.26-2.85,70.9,9.42,98.6,31.56,31.77,25.39,62.32,62,103.63,73,40.44,10.79,81.35-6.69,119.13-24.28s75.16-39,116.92-43.05c59.73-5.85,113.28,22.88,168.9,38.84,30.2,8.66,59,6.17,87.09-7.5,22.43-10.89,48-26.93,60.65-49.24V0Z" opacity=".5" class="shape-fill"></path>
+                <path d="M0,0V5.63C149.93,59,314.09,71.32,475.83,42.57c43-7.64,84.23-20.12,127.61-26.46,59-8.63,112.48,12.24,165.56,35.4C827.93,77.22,886,95.24,951.2,90c86.53-7,172.46-45.71,248.8-84.81V0Z" class="shape-fill"></path>
+            </svg>
+        </div>
+    </div>
+
+
+    <script>
+        function logout() {
+            if (confirm("Are you sure you want to log out?")) {
+                window.location.href = "employee_login.html"; 
+            }
+        }
+
+        // Auto-Slider 
+        document.addEventListener('DOMContentLoaded', () => {
+            const wrapper = document.querySelector('.slider-wrapper');
+            if (wrapper) { 
+                const slides = document.querySelectorAll('.slide');
+                let currentIndex = 0;
+
+                function updateSlider() {
+                    // Move the slider to show the current slide
+                    wrapper.style.transform = `translateX(${-currentIndex * 100}%)`;
+                }
+
+                function nextSlide() {
+                    currentIndex = (currentIndex + 1) % slides.length;
+                    updateSlider();
+                }
+
+                // Start the slider
+                setInterval(nextSlide, 5000); 
+            }
+        });
+    </script>
+
+</body>
+</html>
