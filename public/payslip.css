@@ -5,7 +5,6 @@
   font-family: "Segoe UI", sans-serif;
 }
 
-
 body {
   background-color: #f0f0f0;
   color: #333;
@@ -14,6 +13,7 @@ body {
   flex-direction: column;
 }
 
+/* ===== HEADER ===== */
 /* ===== HEADER ===== */
 .header {
   background: #0D2A4B;
@@ -27,7 +27,6 @@ body {
   background-size: 20px 20px;
 }
 
-/* Logo Section */
 .logo-section {
   display: flex;
   align-items: center;
@@ -41,26 +40,23 @@ body {
 
 .logo-section h1 {
   font-size: 20px;
-
+  font-weight: 700;
 }
 
 .logo-section .blue {
   color: #00AEEF;
 }
 
-/* ===== NAVIGATION ===== */
 .nav {
   display: flex;
   align-items: center;
-  gap: 20px;
-  flex-wrap: wrap;
+  gap: 15px;
 }
 
 .nav a {
   color: white;
   text-decoration: none;
   font-size: 16px;
-  transition: color 0.2s ease;
 }
 
 .nav a:hover {
@@ -71,6 +67,23 @@ body {
   font-weight: bold;
 }
 
+/* ===== LOGOUT BUTTON ===== */
+.logout-btn {
+  background-color: #00AEEF;
+  color: white;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 5px;
+  font-size: 15px;
+  cursor: pointer;
+  transition: 0.3s ease;
+}
+
+.logout-btn:hover {
+  background-color: #008FCB;
+}
+
+
 /* ===== MAIN CONTENT ===== */
 main {
   flex: 1;
@@ -78,6 +91,44 @@ main {
   justify-content: center;
   align-items: center;
   padding: 40px 20px;
+}
+
+/* ===== PAYSLIP ACTION BUTTON ===== */
+.payslip-actions {
+  display: flex;
+  justify-content: flex-end;
+  margin-bottom: 15px;
+}
+
+.record-btn {
+  display: inline-block;
+  background-color: #0D2A4B;
+  color: white;
+  text-decoration: none;
+  padding: 10px 18px;
+  border-radius: 6px;
+  font-size: 14px;
+  transition: background 0.3s ease;
+}
+
+.record-btn:hover {
+  background-color: #00AEEF;
+}
+
+#downloadBtn {
+  background-color: #0D2A4B;
+  color: white;
+  border: none;
+  padding: 10px 18px;
+  border-radius: 6px;
+  font-size: 14px;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+  margin-left: 10px;
+}
+
+#downloadBtn:hover {
+  background-color: #00AEEF;
 }
 
 /* ===== PAYSLIP CARD ===== */
@@ -88,7 +139,6 @@ main {
   box-shadow: 0 4px 8px rgba(0,0,0,0.15);
   width: 90%;
   max-width: 900px;
-  transition: all 0.3s ease-in-out;
 }
 
 /* ===== PAYSLIP HEADER ===== */
@@ -114,53 +164,30 @@ main {
   border-radius: 6px;
   background-color: #f9f9f9;
   cursor: pointer;
-  color: #333;
-  transition: border-color 0.2s ease;
-}
-
-.payslip-header select:hover {
-  border-color: #0D2A4B;
 }
 
 /* ===== EMPLOYEE DETAILS ===== */
 .employee-details {
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-  text-align: left;
   margin-bottom: 20px;
   font-size: 14px;
   line-height: 1.6;
 }
 
-/* ===== TABLES ===== */
-.tables {
-  display: flex;
-  justify-content: space-between;
-  align-items: stretch;
-  gap: 20px;
-  margin-bottom: 25px;
+/* ===== COMBINED TABLE ===== */
+.combined-table table {
   width: 100%;
-  flex-wrap: wrap;
-}
-
-.tables table {
-  flex: 1;
   border-collapse: collapse;
   font-size: 14px;
-  table-layout: fixed;
-  min-width: 280px;
+  margin-bottom: 25px;
 }
 
-.tables table th,
-.tables table td {
+.combined-table th, .combined-table td {
   border: 1px solid #ccc;
   padding: 8px;
   text-align: left;
-  vertical-align: top;
 }
 
-.tables table th {
+.combined-table th {
   background: #f0f0f0;
   font-weight: 600;
 }
@@ -169,7 +196,6 @@ main {
 .netpay {
   text-align: right;
   font-size: 16px;
-  margin-top: 15px;
 }
 
 .netpay span {
@@ -177,76 +203,16 @@ main {
   color: #0D2A4B;
 }
 
-/* ===== RESPONSIVE DESIGN ===== */
-
-/* Tablets */
-@media (max-width: 900px) {
-  .header {
-    padding: 16px 20px;
-  }
-
-  .logo-section img {
-    width: 70px;
-    height: 70px;
-  }
-
-  .payslip-card {
-    padding: 25px;
-  }
-
-  .tables {
-    flex-direction: column;
-  }
-
-  .tables table {
-    width: 100%;
-  }
-
-  .payslip-header h2 {
-    font-size: 20px;
-  }
-}
-
-/* Mobile */
+/* ===== RESPONSIVE ===== */
 @media (max-width: 600px) {
   .header {
     flex-direction: column;
-    align-items: center;
     text-align: center;
-    gap: 10px;
   }
-
-  .nav {
-    justify-content: center;
-  }
-
-  .logo-section img {
-    width: 60px;
-    height: 60px;
-  }
-
-  .logo-section h1 {
-    font-size: 18px;
-  }
-
-  .payslip-card {
-    padding: 20px;
-  }
-
-  .payslip-header h2 {
-    font-size: 18px;
-  }
-
-  .employee-details {
+  .combined-table th, .combined-table td {
     font-size: 13px;
   }
-
-  .tables {
-    gap: 15px;
-  }
-
   .netpay {
     text-align: center;
-    font-size: 15px;
   }
 }
