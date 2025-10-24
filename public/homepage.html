@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Smart Payroll - Home</title>
+  <link rel="stylesheet" href="homepage.css" />
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+
+  <!-- ===== HEADER ===== -->
+  <header class="header">
+    <div class="logo-section">
+      <img src="SPlogo.png" alt="Smart Payroll Logo" class="logo" />
+      <h1><strong>Smart</strong> <span class="blue">Payroll</span></h1>
+    </div>
+
+    <nav class="nav">
+      <a href="homepage.html" class="active">Home</a>
+      <span>|</span>
+      <a href="payslip.html">My Payslip</a>
+      <span>|</span>
+      <button class="logout-btn" onclick="logout()">Logout</button>
+    </nav>
+  </header>
+
+  <!-- ===== MAIN CONTENT ===== -->
+  <main class="main-container">
+    <div class="profile-card">
+      <h2>Welcome, Adriane Tuliao</h2>
+
+      <div class="profile-content">
+        <!-- LEFT: Employee Info -->
+        <div class="profile-left">
+          <div class="profile-pic">
+            <img src="employee.jpg" alt="Employee Picture">
+          </div>
+          <div class="employee-info">
+            <p><strong>Name:</strong> Adriane Tuliao</p>
+            <p><strong>Employee ID:</strong> 123-456</p>
+            <p><strong>Department:</strong> Information Technology (IT)</p>
+            <p><strong>Position:</strong> Maintenance Personnel</p>
+          </div>
+        </div>
+
+        <!-- RIGHT: Charts -->
+        <div class="profile-right">
+          <div class="charts-row">
+            <div class="chart-card">
+              <h3>Attendance (Oct 1–15 / 16–31)</h3>
+              <canvas id="attendanceChart"></canvas>
+            </div>
+
+            <div class="chart-card">
+              <h3>Overtime Hours</h3>
+              <canvas id="overtimeChart"></canvas>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <!-- ===== SCRIPTS ===== -->
+  <script>
+    function logout() {
+      if (confirm("Are you sure you want to log out?")) {
+        window.location.href = "employee_login.html"; // Redirect to login page
+      }
+    }
+
+    // Attendance Chart
+    const ctx1 = document.getElementById('attendanceChart');
+    new Chart(ctx1, {
+      type: 'bar',
+      data: {
+        labels: ['Oct 1–15', 'Oct 16–31'],
+        datasets: [{
+          label: 'Attendance Days',
+          data: [10, 11],
+          backgroundColor: ['#0D2A4B', '#00AEEF'],
+          borderRadius: 6
+        }]
+      },
+      options: {
+        responsive: true,
+        plugins: { legend: { display: false } },
+        scales: {
+          y: {
+            beginAtZero: true,
+            ticks: { color: '#000', stepSize: 2 }
+          },
+          x: { ticks: { color: '#000' } }
+        }
+      }
+    });
+
+    // Overtime Chart
+    const ctx2 = document.getElementById('overtimeChart');
+    new Chart(ctx2, {
+      type: 'line',
+      data: {
+        labels: ['Week 1', 'Week 2', 'Week 3', 'Week 4'],
+        datasets: [{
+          label: 'Overtime Hours',
+          data: [3, 6, 4, 7],
+          borderColor: '#00AEEF',
+          backgroundColor: 'rgba(0, 174, 239, 0.15)',
+          tension: 0.3,
+          fill: true,
+          pointRadius: 4,
+          pointBackgroundColor: '#0D2A4B'
+        }]
+      },
+      options: {
+        responsive: true,
+        plugins: { legend: { position: 'bottom' } },
+        scales: {
+          y: {
+            beginAtZero: true,
+            ticks: { color: '#000', stepSize: 2 }
+          },
+          x: { ticks: { color: '#000' } }
+        }
+      }
+    });
+  </script>
+
+</body>
+</html>
