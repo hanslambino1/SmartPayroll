@@ -1,0 +1,411 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: "Segoe UI", sans-serif;
+}
+
+body {
+  background-color: #f0f0f0;
+  color: #333;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+/* ===== HEADER ===== */
+.header {
+  background: #0D2A4B;
+  color: white;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 16px 40px;
+  flex-wrap: wrap;
+  gap: 10px;
+  background-image: radial-gradient(circle at center, rgba(255,255,255,0.08) 1px, transparent 2px);
+  background-size: 20px 20px;
+}
+
+.logo-section {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.logo-section img {
+  width: 80px;
+  height: 80px;
+}
+
+.logo-section .blue {
+  color: #00AEEF;
+}
+
+.logo-section h1 {
+  font-size: 20px;
+  font-weight: 700;;
+}
+
+
+.logo-section .blue {
+  color: #00AEEF;
+}
+
+.nav {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  flex-wrap: wrap;
+}
+
+.nav a {
+  color: white;
+  text-decoration: none;
+  font-size: 16px;
+}
+
+.nav a:hover {
+  color: #00AEEF;
+}
+
+.nav a.active {
+  font-weight: bold;
+}
+
+/* ===== LOGOUT BUTTON ===== */
+.logout-btn {
+  background-color: #00AEEF;
+  color: white;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 6px;
+  font-size: 15px;
+  cursor: pointer;
+  transition: background 0.3s ease;
+}
+
+.logout-btn:hover {
+  background-color: #008FCB;
+}
+
+
+/* ===== MAIN CONTAINER ===== */
+.container {
+  flex: 1;
+  width: 95%;
+  max-width: 1400px;
+  margin: 40px auto;
+  padding: 30px 40px;
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+}
+
+/* ===== RECORDS HEADER ===== */
+.records-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 25px;
+  flex-wrap: wrap;
+  gap: 15px;
+}
+
+.records-header h2 {
+  color: #0D2A4B;
+  font-size: 22px;
+}
+
+.back-btn {
+  background-color: #0D2A4B;
+  color: white;
+  border: none;
+  padding: 8px 14px;
+  border-radius: 6px;
+  font-size: 14px;
+  cursor: pointer;
+  transition: background 0.3s ease;
+}
+
+.back-btn:hover {
+  background-color: #00AEEF;
+}
+
+/* ===== TABLE ===== */
+.table-wrapper {
+  overflow-x: auto;
+  width: 100%;
+}
+
+.records-table {
+  width: 100%;
+  table-layout: fixed;
+  border-collapse: separate;
+  border-spacing: 0;
+  text-align: center;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  overflow: hidden;
+  min-width: 600px;
+}
+
+.records-table th {
+  background-color: #0D2A4B;
+  color: white;
+  padding: 16px 20px;
+  font-size: 15px;
+  text-wrap: nowrap;
+}
+
+.records-table td {
+  padding: 16px 20px;
+  border-bottom: 1px solid #e0e0e0;
+  font-size: 15px;
+}
+
+.records-table tr:nth-child(even) {
+  background-color: #f8fbff;
+}
+
+.records-table tr:hover {
+  background-color: #e9f4ff;
+}
+
+/* ===== STATUS BADGE ===== */
+.paid {
+  background-color: #c8f7c5;
+  color: #2e7d32;
+  padding: 6px 14px;
+  border-radius: 12px;
+  font-weight: 600;
+  font-size: 14px;
+}
+
+/* ===== VIEW BUTTON ===== */
+.view-btn {
+  background-color: #00AEEF;
+  color: white;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 6px;
+  font-size: 14px;
+  cursor: pointer;
+  transition: background 0.3s ease;
+}
+
+.view-btn:hover {
+  background-color: #0D2A4B;
+}
+
+/* ===== MODAL ===== */
+.modal {
+  display: none;
+  position: fixed;
+  z-index: 1000;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.4);
+  overflow-y: auto;
+  padding: 20px;
+}
+
+.modal-content {
+  background-color: white;
+  margin: 5% auto;
+  padding: 0;
+  border-radius: 10px;
+  width: 600px;
+  max-width: 95%;
+  box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+  animation: fadeIn 0.3s ease;
+}
+
+.modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background-color: #0D2A4B;
+  color: white;
+  padding: 12px 16px;
+  border-radius: 8px 8px 0 0;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.close-btn {
+  font-size: 24px;
+  cursor: pointer;
+}
+
+.close-btn:hover {
+  color: #00AEEF;
+}
+
+.modal-body {
+  padding: 20px 30px;
+  font-size: 15px;
+  line-height: 1.6;
+  overflow-x: auto;
+}
+
+.modal-footer {
+  text-align: right;
+  padding: 10px 20px 20px;
+}
+
+.close-btn-footer {
+  background-color: #0D2A4B;
+  color: white;
+  border: none;
+  padding: 8px 14px;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background 0.3s ease;
+}
+
+.close-btn-footer:hover {
+  background-color: #00AEEF;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: scale(0.9); }
+  to { opacity: 1; transform: scale(1); }
+}
+
+/* ===== PAYSLIP TABLE INSIDE MODAL ===== */
+.payslip-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 10px;
+  min-width: 500px;
+}
+
+.payslip-table th,
+.payslip-table td {
+  padding: 10px 12px;
+  text-align: left;
+  vertical-align: top;
+  font-size: 15px;
+}
+
+.payslip-table th {
+  width: 50%;
+  color: #0D2A4B;
+  font-weight: 600;
+}
+
+.payslip-table td {
+  color: #333;
+  word-break: break-word;
+}
+
+.payslip-table tr:nth-child(even) {
+  background-color: #f9f9f9;
+}
+
+.payslip-table hr {
+  border: none;
+  border-top: 1px solid #ccc;
+}
+
+/* RESPONSIVE */
+
+/* Tablets */
+@media (max-width: 900px) {
+  .header {
+    padding: 15px 25px;
+  }
+
+  .logo-section img {
+    width: 60px;
+    height: 60px;
+  }
+
+  .nav a {
+    font-size: 14px;
+  }
+
+  .container {
+    width: 95%;
+    padding: 20px;
+  }
+
+  .records-table th,
+  .records-table td {
+    font-size: 14px;
+    padding: 12px 10px;
+  }
+
+  .modal-content {
+    width: 90%;
+  }
+
+  .modal-body {
+    padding: 15px 20px;
+  }
+}
+
+/* Mobile  */
+@media (max-width: 600px) {
+  .header {
+    flex-direction: column;
+    text-align: center;
+  }
+
+  .logo-section {
+    flex-direction: column;
+  }
+
+  .nav {
+    justify-content: center;
+    gap: 10px;
+  }
+
+  .records-header {
+    flex-direction: column;
+    text-align: center;
+  }
+
+  .back-btn {
+    width: 100%;
+  }
+
+  .records-table {
+    font-size: 13px;
+  }
+
+  .records-table th, 
+  .records-table td {
+    padding: 10px;
+  }
+
+  .modal-content {
+    width: 95%;
+    margin-top: 15%;
+  }
+
+  .modal-header h2 {
+    font-size: 18px;
+  }
+
+  .payslip-table th,
+  .payslip-table td {
+    font-size: 14px;
+    display: block;
+    width: 100%;
+  }
+
+  .payslip-table th {
+    background: #0D2A4B;
+    color: #fff;
+    border-radius: 5px 5px 0 0;
+  }
+
+  .payslip-table td {
+    border-bottom: 2px solid #eee;
+    padding-bottom: 10px;
+  }
+}
