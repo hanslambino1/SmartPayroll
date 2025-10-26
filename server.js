@@ -6,27 +6,24 @@ const bcrypt = require("bcryptjs");
 const mysql = require("mysql2");
 const payrollRoutes = require("./payroll.js");
 const reportsRoutes = require("./reports.js");
+const employeesRoutes = require("./employee.js");
 
 const app = express();
 
 // Middleware
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(express.json());
-app.use(express.static(path.join(__dirname, "public")));
-app.use("/api/payroll", payrollRoutes);
-app.use("/api/reports", reportsRoutes);
-app.use(express.static(path.join(__dirname, "node_modules")));
-
-
+// ✅ Session middleware should come before routes
 app.use(
   session({
     secret: "smartpayroll_secret",
     resave: false,
-    saveUninitialized: true,
+    saveUninitialized: false,
+    cookie: { secure: false },
   })
 );
 
-// MySQL Connection
+// ✅ Database connection before using db
 const db = mysql.createConnection({
   host: "localhost",
   user: "root",
@@ -39,31 +36,75 @@ db.connect((err) => {
   console.log("✅ Connected to MySQL Database");
 });
 
-// Login Route
-app.post("/login", (req, res) => {
+// ✅ Static files
+app.use(express.static(path.join(__dirname, "public")));
+app.use(express.static(path.join(__dirname, "node_modules")));
+
+// === ROUTE MOUNTING ===
+app.use("/api/reports", reportsRoutes);
+app.use("/api/payroll", payrollRoutes);
+app.use("/api/employees", employeesRoutes);
+app.use('/api', employeesRoutes);
+
+// === DEFAULT PAGE ===
+app.get("/", (req, res) => {
+  res.sendFile(path.join(__dirname, "public", "LOGIN.html"));
+});
+
+// ✅ Now routes (like /admin/login) can safely use req.session
+app.post("/admin/login", (req, res) => {
   const { username, password } = req.body;
-
-  const sql = "SELECT * FROM employees WHERE username = ?";
+  const sql = "SELECT * FROM admin_accounts WHERE username = ?";
+  
   db.query(sql, [username], async (err, results) => {
-    if (err) return res.send("Database error");
-    if (results.length === 0) return res.send("User not found");
+    if (err)
+      return res.status(500).json({ success: false, message: "Database error" });
+    if (results.length === 0)
+      return res.status(404).json({ success: false, message: "Admin not found" });
 
-    const user = results[0];
-    const valid = await bcrypt.compare(password, user.password);
-    if (!valid) return res.send("Invalid password");
+    const admin = results[0];
+    let isValid = false;
 
-    req.session.user = user;
-    res.redirect("/DASHBOARD.html");
+    if (admin.password.startsWith("$2a$") || admin.password.startsWith("$2b$")) {
+      isValid = await bcrypt.compare(password, admin.password);
+    } else {
+      isValid = password === admin.password;
+    }
+
+    if (!isValid)
+      return res.status(401).json({ success: false, message: "Invalid password" });
+
+    // ✅ Session works now
+    req.session.user = {
+      id: admin.id,
+      username: admin.username,
+      name: admin.name,
+      role: "Admin",
+    };
+
+    res.json({
+      success: true,
+      message: "Admin login successful",
+      user: req.session.user,
+    });
   });
 });
+
+
 
 // API route to get user info
 app.get("/api/user", (req, res) => {
   if (!req.session.user) {
     return res.status(401).json({ error: "Not logged in" });
   }
-  res.json({ name: req.session.user.username });
+  res.json({
+    id: req.session.user.id,
+    username: req.session.user.username,
+    name: req.session.user.name,
+    department: req.session.user.department,
+  });
 });
+
 
 // Fetch total employees
 //app.get("/api/employees", (req, res) => {
@@ -658,5 +699,37 @@ app.post("/api/dtr/timeout", (req, res) => {
       });
     }
   });
+});
+
+// ✅ Change password for employee/admin
+app.post("/api/change-password", async (req, res) => {
+  const { currentPassword, newPassword, employeeId } = req.body;
+
+  if (!currentPassword || !newPassword || !employeeId) {
+    return res.status(400).json({ error: "Missing required fields" });
+  }
+
+  try {
+    // Check if employee exists
+    const [rows] = await db.promise().query("SELECT password FROM employees WHERE id = ?", [employeeId]);
+    if (rows.length === 0) return res.status(404).json({ error: "Employee not found" });
+
+    const employee = rows[0];
+
+    // Compare current password
+    const match = await bcrypt.compare(currentPassword, employee.password);
+    if (!match) return res.status(401).json({ error: "Current password is incorrect" });
+
+    // Hash new password
+    const hashed = await bcrypt.hash(newPassword, 10);
+
+    // Update DB
+    await db.promise().query("UPDATE employees SET password = ? WHERE id = ?", [hashed, employeeId]);
+
+    res.json({ message: "Password updated successfully" });
+  } catch (err) {
+    console.error("Error updating password:", err);
+    res.status(500).json({ error: "Internal server error" });
+  }
 });
 

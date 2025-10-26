@@ -83,4 +83,14 @@ module.exports = router;
 
 
 
-
+// ✅ Get total payroll processed count
+router.get("/count", (req, res) => {
+  const sql = "SELECT COUNT(*) AS totalProcessed FROM payroll";
+  db.query(sql, (err, results) => {
+    if (err) {
+      console.error("Error fetching payroll count:", err);
+      return res.status(500).json({ error: "Database error" });
+    }
+    res.json(results[0]);
+  });
+});
