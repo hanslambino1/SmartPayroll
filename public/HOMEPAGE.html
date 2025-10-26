@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Smart Payroll - Home</title>
     <link rel="stylesheet" href="homepage.css" />
+    <link rel="icon" type="image/png" href="SPlogo.png">
     <script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script> 
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
@@ -29,18 +30,19 @@
     <main class="main-container">
         <div class="curved-hero-section">
             <div class="profile-card">
-                <h2>Welcome, Adriane</h2>
+                <h2>Welcome, </h2>
 
                 <div class="profile-content">
                     
                     <div class="profile-left">
                         <div class="info-card">
                             <div class="employee-info">
-                                <p><strong>Name:</strong> Adriane Tuliao</p>
-                                <p><strong>Employee ID:</strong> 123-456</p>
-                                <p><strong>Department:</strong> Information Technology (IT)</p>
-                                <p><strong>Position:</strong> Maintenance Personnel</p>
-                            </div>
+    <p><strong>Name:</strong> <span id="empName">Loading...</span></p>
+    <p><strong>Employee ID:</strong> <span id="empID">Loading...</span></p>
+    <p><strong>Department:</strong> <span id="empDept">Loading...</span></p>
+    <p><strong>Position:</strong> <span id="empPosition">Loading...</span></p>
+</div>
+
                         </div>
                     </div>
 
@@ -109,6 +111,29 @@
                 setInterval(nextSlide, 5000); 
             }
         });
+
+        // Fetch and display employee info
+        document.addEventListener('DOMContentLoaded', async () => {
+  try {
+    const res = await fetch('/api/employees/me');
+    if (!res.ok) throw new Error('Not logged in');
+    const data = await res.json();
+
+    document.getElementById('empName').textContent = data.name;
+    document.getElementById('empID').textContent = data.id;
+    document.getElementById('empDept').textContent = data.dept;
+    document.getElementById('empPosition').textContent = data.position;
+
+    // Dynamically update the welcome header
+    const welcomeHeader = document.querySelector('.profile-card h2');
+    welcomeHeader.textContent = `Welcome, ${data.name}`;
+
+  } catch (err) {
+    console.error(err);
+    alert('Failed to load employee data. Redirecting to login.');
+    window.location.href = 'employee_login.html';
+  }
+});
     </script>
 
 </body>

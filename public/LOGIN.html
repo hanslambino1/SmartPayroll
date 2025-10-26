@@ -30,16 +30,18 @@
   <div class="login-box">
     <h1>Login</h1>
 
-    <form action="/login" method="POST">
-      <div class="input-group">
-        <input type="text" name="username" placeholder="Username or Email" required>
-      </div>
-      <div class="input-group">
-        <input name="password" type="password" placeholder="Password" required>
-      </div>
-      <button type="submit" class="btn">Login</button>
-      <a href="#" class="forgot">Forgot Password?</a>
-    </form>
+    <form id="loginForm">
+  <div class="input-group">
+    <input type="text" id="username" placeholder="Username or Email" required>
+  </div>
+  <div class="input-group">
+    <input type="password" id="password" placeholder="Password" required>
+  </div>
+  <button type="submit" class="btn">Login</button>
+  <a href="#" class="forgot">Forgot Password?</a>
+</form>
+
+
   </div>
 </main>
 </body>
@@ -78,6 +80,39 @@
     </p>
   </div>
 </div>
+
+<script>
+document.getElementById("loginForm").addEventListener("submit", async (e) => {
+  e.preventDefault();
+
+  const username = document.getElementById("username").value.trim();
+  const password = document.getElementById("password").value.trim();
+
+  try {
+    const res = await fetch("/admin/login", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ username, password }),
+    });
+
+    const data = await res.json();
+
+    if (res.ok && data.success) {
+      localStorage.setItem("adminId", data.user.id);
+      localStorage.setItem("username", data.user.username);
+      localStorage.setItem("role", data.user.role);
+
+      // Redirect to dashboard
+      window.location.href = "DASHBOARD.html";
+    } else {
+      alert(data.message || "Login failed");
+    }
+  } catch (err) {
+    console.error("Login fetch error:", err);
+    alert("Something went wrong. Please try again.\n\nDetails: " + err.message);
+  }
+});
+</script>
 </html>
 
 

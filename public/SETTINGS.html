@@ -70,81 +70,154 @@
 
           <button type="submit" class="save-btn">Update Password</button>
 
-          <!-- Success Modal -->
-          <div id="successModal" class="modal">
-            <div class="modal-content">
-              <h2>Password Updated!</h2>
-              <p>Your password has been successfully changed.</p>
-              <button id="closeModal" class="close-btn">OK</button>
-            </div>
-          </div>
+          <!-- ✅ Confirmation Modal -->
+<div id="confirmModal" class="modal">
+  <div class="modal-content">
+    <h2>Confirm Change</h2>
+    <p>Are you sure you want to change your password?</p>
+    <div style="display: flex; justify-content: center; gap: 15px;">
+      <button id="confirmYes" class="close-btn">Yes</button>
+      <button id="confirmNo" class="close-btn" style="background: #ccc; color: #333;">No</button>
+    </div>
+  </div>
+</div>
+
+
+          <!-- ✅ Success Modal -->
+<div id="successModal" class="modal">
+  <div class="modal-content">
+    <h2>Password Changed Successfully!</h2>
+    <p>Your password has been updated.</p>
+    <button class="close-btn" id="closeModal">OK</button>
+  </div>
+</div>
+
         </form>
       </div>
     </main>
   </div>
 
   <script>
-    // Fade animation
-    window.addEventListener("DOMContentLoaded", () => {
-      const main = document.querySelector(".main");
-      setTimeout(() => main.classList.add("show"), 50);
+  // Fade animation
+ // Fade animation
+window.addEventListener("DOMContentLoaded", () => {
+  const main = document.querySelector(".main");
+  setTimeout(() => main.classList.add("show"), 50);
+});
+
+// Logout confirmation
+document.getElementById("logoutBtn").addEventListener("click", () => {
+  if (confirm("Are you sure you want to log out?")) {
+    localStorage.removeItem("employeeId");
+    fetch("/logout")
+      .then(() => (window.location.href = "/LOGIN.html"))
+      .catch(() => alert("Error logging out. Please try again."));
+  }
+});
+
+// Toggle password visibility
+document.querySelectorAll(".toggle-password").forEach(btn => {
+  btn.addEventListener("click", () => {
+    const targetId = btn.getAttribute("data-target");
+    const input = document.getElementById(targetId);
+    const img = btn.querySelector("img");
+    const isHidden = input.type === "password";
+
+    input.type = isHidden ? "text" : "password";
+    img.src = isHidden ? "eye.png" : "eye-crossed.png";
+  });
+});
+
+const form = document.getElementById("passwordForm");
+const saveBtn = form.querySelector(".save-btn");
+const successModal = document.getElementById("successModal");
+const confirmModal = document.getElementById("confirmModal");
+const confirmYes = document.getElementById("confirmYes");
+const confirmNo = document.getElementById("confirmNo");
+const closeModal = document.getElementById("closeModal");
+
+let currentPassword = "";
+let newPassword = "";
+let confirmPassword = "";
+let isProcessing = false; // 🔒 prevents double action
+
+form.addEventListener("submit", e => {
+  e.preventDefault();
+
+  if (isProcessing) return; // Prevent double click
+  currentPassword = document.getElementById("currentPassword").value.trim();
+  newPassword = document.getElementById("newPassword").value.trim();
+  confirmPassword = document.getElementById("confirmPassword").value.trim();
+
+  document.querySelector(".error-message")?.remove();
+
+  if (newPassword !== confirmPassword) {
+    const errorMsg = document.createElement("p");
+    errorMsg.textContent = "❌ New Password and Confirm Password do not match.";
+    errorMsg.className = "error-message";
+    errorMsg.style.color = "red";
+    errorMsg.style.marginTop = "8px";
+    form.querySelector("#confirmPassword").parentNode.appendChild(errorMsg);
+    return;
+  }
+
+  confirmModal.style.display = "flex";
+});
+
+// ✅ When "Yes" is clicked
+confirmYes.addEventListener("click", async () => {
+  confirmModal.style.display = "none";
+  if (isProcessing) return;
+  isProcessing = true;
+  saveBtn.disabled = true;
+
+  const employeeId = localStorage.getItem("employeeId");
+  if (!employeeId) {
+    alert("User not logged in!");
+    isProcessing = false;
+    saveBtn.disabled = false;
+    return;
+  }
+
+  try {
+    const response = await fetch("/api/change-password", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ currentPassword, newPassword, employeeId }),
     });
 
-    // Logout confirmation
-    document.getElementById("logoutBtn").addEventListener("click", () => {
-      if (confirm("Are you sure you want to log out?")) {
-        fetch("/logout")
-          .then(() => (window.location.href = "/LOGIN.html"))
-          .catch(() => alert("Error logging out. Please try again."));
-      }
-    });
+    const result = await response.json();
+    if (!response.ok) throw new Error(result.error || "Failed to change password");
 
-    // Toggle password visibility
-    document.querySelectorAll(".toggle-password").forEach(btn => {
-      btn.addEventListener("click", () => {
-        const targetId = btn.getAttribute("data-target");
-        const input = document.getElementById(targetId);
-        const img = btn.querySelector("img");
-        const isHidden = input.type === "password";
+    successModal.style.display = "flex";
+  } catch (error) {
+    alert(error.message);
+  } finally {
+    isProcessing = false;
+    saveBtn.disabled = false;
+  }
+});
 
-        input.type = isHidden ? "text" : "password";
-        img.src = isHidden ? "eye.png" : "eye-crossed.png";
-      });
-    });
+// ❌ When "No" is clicked
+confirmNo.addEventListener("click", () => {
+  confirmModal.style.display = "none";
+});
 
-    // Password Update + Modal
-    const form = document.getElementById("passwordForm");
-    const modal = document.getElementById("successModal");
-    const closeModal = document.getElementById("closeModal");
+// ✅ Close success modal
+closeModal.addEventListener("click", () => {
+  successModal.style.display = "none";
+  form.reset();
+  currentPassword = newPassword = confirmPassword = "";
+  isProcessing = false; // reset lock
+});
 
-    form.addEventListener("submit", e => {
-      e.preventDefault();
-      const newPass = document.getElementById("newPassword").value.trim();
-      const confirmPass = document.getElementById("confirmPassword").value.trim();
+// Close modal if clicking outside
+window.addEventListener("click", e => {
+  if (e.target === successModal) successModal.style.display = "none";
+  if (e.target === confirmModal) confirmModal.style.display = "none";
+});
 
-      document.querySelector(".error-message")?.remove();
+</script>
 
-      if (newPass !== confirmPass) {
-        const errorMsg = document.createElement("p");
-        errorMsg.textContent = "❌ New Password and Confirm Password do not match.";
-        errorMsg.className = "error-message";
-        errorMsg.style.color = "red";
-        errorMsg.style.marginTop = "8px";
-        form.querySelector("#confirmPassword").parentNode.appendChild(errorMsg);
-        return;
-      }
-
-      modal.style.display = "flex"; // ✅ Show modal properly
-    });
-
-    closeModal.addEventListener("click", () => {
-      modal.style.display = "none";
-      form.reset();
-    });
-
-    window.addEventListener("click", e => {
-      if (e.target === modal) modal.style.display = "none";
-    });
-  </script>
 </body>
 </html>

@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Smart Payroll - Payslip</title>
+  <link rel="stylesheet" href="payslip.css">
+</head>
+<body>
+  <!-- ===== HEADER ===== -->
+  <header class="header">
+    <div class="logo-section">
+      <img src="SPlogo.png" alt="Smart Payroll Logo">
+      <h1><strong>Smart</strong> <span class="blue">Payroll</span></h1>
+    </div>
+
+    <nav class="nav">
+      <a href="homepage.html">Home</a>
+      <span>|</span>
+      <a href="payslip.html" class="active">My Payslip</a>
+      <span>|</span>
+      <button class="logout-btn" onclick="logout()">Logout</button>
+    </nav>
+  </header>
+
+  <!-- ===== PAYSLIP CARD ===== -->
+  <main>
+    <div class="payslip-card">
+
+      <!-- Top Buttons -->
+      <div class="payslip-actions">
+        <a href="payslip_record.html" class="record-btn">Payslip Records</a>
+        <button id="downloadBtn">Download Payslip</button>
+      </div>
+
+      <div class="payslip-header">
+        <h2 id="payslipTitle">Select a period to view payslip</h2>
+        <select id="payslipPeriod">
+          <option value="">-- Select Period --</option>
+        </select>
+      </div>
+
+      <!-- Employee Details -->
+      <div class="payslip-card">
+
+  <!-- Only export this -->
+  <div id="payslipContent">
+    <div class="payslip-header">
+     
+    </div>
+
+    <div class="employee-details"></div>
+
+    <div class="combined-table">
+      <table id="salaryTable">
+        <thead>
+          <tr>
+            <th>Earnings</th>
+            <th>Amount</th>
+            <th>Deductions</th>
+            <th>Amount</th>
+          </tr>
+        </thead>
+        <tbody></tbody>
+        <tfoot>
+          <tr>
+            <td><strong>Total Earnings</strong></td>
+            <td id="totalEarnings"><strong>₱ 0.00</strong></td>
+            <td><strong>Total Deductions</strong></td>
+            <td id="totalDeductions"><strong>₱ 0.00</strong></td>
+          </tr>
+        </tfoot>
+      </table>
+    </div>
+
+    <div class="netpay">
+      <p><strong>Net Pay for the month:</strong> <span>₱ 0.00</span></p>
+    </div>
+  </div>
+
+</div>
+
+  </main>
+
+  <!-- ===== LIBRARY: html2pdf ===== -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+
+  <!-- ===== SCRIPT ===== -->
+  <script>
+    let employeeID;
+
+    async function logout() {
+      if (confirm("Are you sure you want to log out?")) {
+        window.location.href = "employee_login.html";
+      }
+    }
+
+    // ===== Fetch logged-in employee and payslip periods =====
+    document.addEventListener("DOMContentLoaded", async () => {
+      try {
+        // Get logged-in employee
+        const res = await fetch("/api/employees/me", { credentials: "include" });
+        if (!res.ok) throw new Error("Not logged in");
+        const emp = await res.json();
+        employeeID = emp.id;
+
+        
+        // Fetch latest salary
+        const salaryRes = await fetch("/api/employees/salary", { credentials: "include" });
+        const salaryData = await salaryRes.json();
+  
+        // Populate employee details
+        document.querySelector(".employee-details").innerHTML = `
+          <p><strong>Name:</strong> ${emp.name}</p>
+          <p><strong>Position:</strong> ${emp.position}</p>
+          <p><strong>Department:</strong> ${emp.dept}</p>
+          <p><strong>Employee ID:</strong> ${emp.id}</p>
+          <p><strong>Basic Salary (Monthly):</strong> ₱ ${Number(salaryData.basic_salary).toLocaleString()}</p>
+        `;
+
+        // Fetch payslip periods
+        const periodsRes = await fetch(`/api/employees/payslip/periods?employee_id=${employeeID}`, { credentials: "include" });
+        if (!periodsRes.ok) throw new Error("Failed to load periods");
+        const periods = await periodsRes.json();
+
+        const periodSelect = document.getElementById("payslipPeriod");
+        periodSelect.innerHTML = '<option value="">-- Select Period --</option>' +
+          periods.map(p => `<option value="${p.id}">${p.coverage}</option>`).join("");
+
+      } catch (err) {
+        console.error(err);
+        alert("Not logged in or failed to load data.");
+        window.location.href = "employee_login.html";
+      }
+    });
+
+    // ===== Load payslip when a period is selected =====
+    document.getElementById("payslipPeriod").addEventListener("change", async function() {
+      const payrollID = this.value;
+      if (!payrollID) return;
+
+      try {
+        const res = await fetch(`/api/employees/payslip/${payrollID}`, { credentials: "include" });
+        if (!res.ok) throw new Error("Payslip not found");
+        const p = await res.json();
+
+        document.getElementById("payslipTitle").textContent = "Payslip for " + p.coverage;
+
+        const tbody = document.querySelector("#salaryTable tbody");
+        tbody.innerHTML = "";
+
+        const earnings = [
+          ["Daily Salary", p.daily_rate],
+          ["Overtime", p.overtime_pay]
+        ];
+
+        const deductions = [
+          ["SSS", p.sss],
+          ["PhilHealth", p.philhealth],
+          ["Pag-IBIG", p.pagibig],
+          ["Late", p.late_deduction],
+          ["Undertime", p.undertime_deduction]
+        ];
+
+        const maxRows = Math.max(earnings.length, deductions.length);
+        for (let i = 0; i < maxRows; i++) {
+          const earn = earnings[i] || ["", 0];
+          const ded = deductions[i] || ["", 0];
+          tbody.innerHTML += `
+            <tr>
+              <td>${earn[0]}</td><td>₱ ${Number(earn[1] || 0).toLocaleString()}</td>
+              <td>${ded[0]}</td><td>₱ ${Number(ded[1] || 0).toLocaleString()}</td>
+            </tr>
+          `;
+        }
+
+        const totalEarnings = earnings.reduce((sum, e) => sum + Number(e[1] || 0), 0);
+        const totalDeductions = deductions.reduce((sum, d) => sum + Number(d[1] || 0), 0);
+
+        document.getElementById("totalEarnings").innerHTML = `<strong>₱ ${totalEarnings.toLocaleString()}</strong>`;
+        document.getElementById("totalDeductions").innerHTML = `<strong>₱ ${totalDeductions.toLocaleString()}</strong>`;
+        document.querySelector(".netpay span").textContent = `₱ ${p.net_pay.toLocaleString()}`;
+
+      } catch (err) {
+        console.error(err);
+        alert("Failed to load payslip for this period.");
+      }
+    });
+
+    // ===== Download PDF =====
+    document.getElementById("downloadBtn").addEventListener("click", () => {
+  const payslip = document.getElementById("payslipContent"); 
+  const opt = {
+    margin: 0.5,
+    filename: document.getElementById("payslipTitle").textContent.replace(/\s+/g, "_") + '.pdf',
+    image: { type: 'jpeg', quality: 0.98 },
+    html2canvas: { scale: 2 },
+    jsPDF: { unit: 'in', format: 'letter', orientation: 'portrait' }
+  };
+  html2pdf().set(opt).from(payslip).save();
+});
+
+  </script>
+</body>
+</html>

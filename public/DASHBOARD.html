@@ -68,7 +68,7 @@
     <!-- Payroll Processed -->
     <div class="card">
       <h3><img src="user.png" class="icon"> Payroll Processed</h3>
-      <p class="value" id="payrollCount">0</p>
+      <p class="value" id="payrollProcessed">0</p>
     </div>
 
     <!-- Real Report Charts -->
@@ -228,16 +228,14 @@ function formatDate(dateStr) {
   return d.toLocaleDateString("en-US", { month: "short", day: "numeric" });
 }
 
-// ✅ Fetch total payroll processed
-fetch("/api/payroll/count")
+// Fetch total payroll processed
+fetch("/api/reports/payroll/processed")
   .then(res => res.json())
   .then(data => {
-    document.getElementById("payrollProcessed").textContent = data.totalProcessed;
+    document.getElementById("payrollProcessed").textContent = data.totalProcessed || 0;
   })
   .catch(err => console.error("Error fetching payroll count:", err));
-
+  
 </script>
-
-
 </body>
 </html>
