@@ -260,7 +260,7 @@ app.get("/api/employees", (req, res) => {
 
   let params = [];
   let sql = `
-    SELECT DISTINCT e.id, e.name, e.dept, e.position, 
+    SELECT DISTINCT e.id, e.name, e.dept, e.position, e.salary,
            DATE_FORMAT(e.date_hired, '%Y-%m-%d') AS date_hired, 
            e.status, e.activity_status
     FROM employees e
