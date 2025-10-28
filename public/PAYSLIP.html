@@ -4,6 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Smart Payroll - Payslip</title>
+  <link rel="icon" type="image/png" href="SPlogo.png">
   <link rel="stylesheet" href="payslip.css">
 </head>
 <body>
@@ -19,7 +20,9 @@
       <span>|</span>
       <a href="payslip.html" class="active">My Payslip</a>
       <span>|</span>
-      <button class="logout-btn" onclick="logout()">Logout</button>
+      <div class="logout-container">
+        <button id="logoutBtn" class="logout-btn">Logout
+        </button>
     </nav>
   </header>
 
@@ -80,6 +83,23 @@
 
 </div>
 
+<!-- Logout Confirmation Modal -->
+<div id="logoutModal" class="modal-logout">
+  <div class="modal-content-logout">
+    <div class="modal-header-logout">
+      <h3>Confirm Logout</h3>
+      <span class="close-btn" id="closeLogout">&times;</span>
+    </div>
+    <div class="modal-body-logout">
+      <p>Are you sure you want to log out of SmartPayroll?</p>
+    </div>
+    <div class="modal-buttons">
+      <button id="confirmLogout" class="confirm-btn">Yes</button>
+      <button id="cancelLogout" class="cancel-btn">Cancel</button>
+    </div>
+  </div>
+</div>
+
   </main>
 
   <!-- ===== LIBRARY: html2pdf ===== -->
@@ -87,6 +107,23 @@
 
   <!-- ===== SCRIPT ===== -->
   <script>
+     // ===== LOGOUT MODAL =====
+  const logoutBtn = document.getElementById("logoutBtn");
+  const logoutModal = document.getElementById("logoutModal");
+  const confirmLogout = document.getElementById("confirmLogout");
+  const cancelLogout = document.getElementById("cancelLogout");
+
+  logoutBtn.addEventListener("click", () => logoutModal.style.display = "flex");
+  cancelLogout.addEventListener("click", () => logoutModal.style.display = "none");
+  confirmLogout.addEventListener("click", () => {
+    fetch("/logout").then(() => window.location.href = "/employee_login.html");
+  });
+  window.addEventListener("click", e => {
+    if (e.target === logoutModal) logoutModal.style.display = "none";
+  });
+
+
+
     let employeeID;
 
     async function logout() {

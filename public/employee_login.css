@@ -7,7 +7,7 @@
 
 /* Body */
 body {
-  background-color: #0b1221;
+  background-color: #0f172a;
   color: #fff;
   height: 100vh;
   display: flex;
@@ -21,9 +21,11 @@ body {
 
 /* Header */
 .header {
+  width: 100%;
+  padding: 20px 50px;
   position: absolute;
-  top: 25px;
-  left: 40px;
+  top: 0px;
+  left: 0px;
   display: flex;
   align-items: center;
 }
@@ -35,8 +37,8 @@ body {
 }
 
 .logo {
-  width: 120px;
-  height: 120px;
+  width: 100px;
+  height: 100px;
   object-fit: contain;
 }
 
@@ -230,3 +232,4 @@ footer a:hover {
     align-items: center;
   }
 }
+

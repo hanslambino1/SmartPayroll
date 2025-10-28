@@ -25,10 +25,10 @@
       </ul>
 
       <div class="logout-container">
-        <button class="logout-btn">
-          <img src="logout-icon.png" alt="Logout" class="icon" /> Logout
-        </button>
-      </div>
+      <button id="logoutBtn" class="logout-btn">
+        <img src="logout.png" class="icon" />Logout
+      </button>
+    </div>
     </aside>
 
     <!-- Main Content -->
@@ -91,7 +91,40 @@
 
   <script src="payroll_history.js"></script>
 
+  <!-- Logout Confirmation Modal -->
+<div id="logoutModal" class="modal-logout">
+  <div class="modal-content-logout">
+    <div class="modal-header-logout">
+      <h3>Confirm Logout</h3>
+      <span class="close-btn" id="closeLogout">&times;</span>
+    </div>
+    <div class="modal-body-logout">
+      <p>Are you sure you want to log out of SmartPayroll?</p>
+    </div>
+    <div class="modal-buttons">
+      <button id="confirmLogout" class="confirm-btn">Yes</button>
+      <button id="cancelLogout" class="cancel-btn">Cancel</button>
+    </div>
+  </div>
+</div>
+
   <script>
+    // ===== LOGOUT MODAL =====
+  const logoutBtn = document.getElementById("logoutBtn");
+  const logoutModal = document.getElementById("logoutModal");
+  const confirmLogout = document.getElementById("confirmLogout");
+  const cancelLogout = document.getElementById("cancelLogout");
+
+  logoutBtn.addEventListener("click", () => logoutModal.style.display = "flex");
+  cancelLogout.addEventListener("click", () => logoutModal.style.display = "none");
+  confirmLogout.addEventListener("click", () => {
+    fetch("/logout").then(() => window.location.href = "/LOGIN.html");
+  });
+  window.addEventListener("click", e => {
+    if (e.target === logoutModal) logoutModal.style.display = "none";
+  });
+
+
     // Close modal
     const modal = document.getElementById("payslipModal");
     const closeBtn = document.querySelector(".close");

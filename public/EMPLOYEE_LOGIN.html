@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -22,17 +21,19 @@
     <h1 class="login-title">Login</h1>
 
     <form class="login-form" id="loginForm">
-  <input type="text" name="id" placeholder="Employee ID" required>
-  <div class="password-wrapper">
-    <input id="password" name="password" type="password" placeholder="Password" required>
-    <button type="button" id="togglePassword" class="toggle-password" aria-label="Show password">
-      <img id="eyeIcon" src="eye-crossed.png" />
-    </button>
-  </div>
-  <button type="submit" class="login-btn">Login</button>
-  <a href="#" class="forgot-password">Forgot Password?</a>
-</form>
+      <input type="text" name="id" placeholder="Employee ID" required>
 
+      <!-- Password Field -->
+      <input id="password" name="password" type="password" placeholder="Password" required>
+
+      <!-- Error Message -->
+      <p id="error-message" class="error-message" style="display:none; color:red; margin-top:8px;">
+        Invalid Employee ID or Password
+      </p>
+
+      <button type="submit" class="login-btn">Login</button>
+      <a href="#" class="forgot-password">Forgot Password?</a>
+    </form>
   </div>
 
   <!-- Footer -->
@@ -44,57 +45,56 @@
   </footer>
 
   <script>
-  // Toggle password visibility
-  const passwordInput = document.getElementById("password");
-  const toggleBtn = document.getElementById("togglePassword");
-  const eyeIcon = document.getElementById("eyeIcon");
-
-  toggleBtn.addEventListener("click", () => {
-    const isHidden = passwordInput.type === "password";
-    passwordInput.type = isHidden ? "text" : "password";
-
-    // Change the icon
-    eyeIcon.src = isHidden ? "eye.png" : "eye-crossed.png";
-    eyeIcon.alt = isHidden ? "Hide Password" : "Show Password";
-  });
-
-  // Employee login
   const loginForm = document.getElementById('loginForm');
+  const errorMsg = document.getElementById('error-message');
+  const passwordInput = document.getElementById('password');
 
   loginForm.addEventListener('submit', async (e) => {
     e.preventDefault();
 
     const id = loginForm.id.value.trim();
-    const password = loginForm.password.value;
+    const password = passwordInput.value;
 
+    // Check if both fields filled
     if (!id || !password) {
       alert('Please enter both Employee ID and Password.');
       return;
     }
 
+    // Passworc validation
+    const hasNumber = /\d/.test(password);
+    const hasSpecialChar = /[!@#$%^&*(),.?":{}|<>]/.test(password);
+    const isLongEnough = password.length >= 12;
+
+    if (!isLongEnough || !hasNumber || !hasSpecialChar) {
+      errorMsg.textContent = "Invalid Employee ID or Password";
+      errorMsg.style.display = 'block';
+      return;
+    } else {
+      errorMsg.style.display = 'none'; 
+    }
+
     try {
       const res = await fetch('/api/employees/login', {
-  method: 'POST',
-  headers: { 'Content-Type': 'application/json' },
-  body: JSON.stringify({ id, password })
-});
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ id, password })
+      });
 
       const data = await res.json();
 
       if (res.ok) {
-        // Save employee info in localStorage/sessionStorage
         localStorage.setItem('employee', JSON.stringify(data));
-        // Redirect to employee homepage
         window.location.href = 'HOMEPAGE.html';
       } else {
-        alert(data.message || 'Login failed. Check your ID or password.');
+        errorMsg.textContent = "Invalid Employee ID or Password";
+        errorMsg.style.display = 'block';
       }
     } catch (err) {
       console.error(err);
       alert('Server error. Please try again later.');
     }
   });
-</script>
-
+  </script>
 </body>
 </html>

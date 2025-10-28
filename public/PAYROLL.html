@@ -82,10 +82,41 @@
   </div>
 </div>
 
+<!-- Logout Confirmation Modal -->
+<div id="logoutModal" class="modal-logout">
+  <div class="modal-content-logout">
+    <div class="modal-header-logout">
+      <h3>Confirm Logout</h3>
+      <span class="close-btn" id="closeLogout">&times;</span>
+    </div>
+    <div class="modal-body-logout">
+      <p>Are you sure you want to log out of SmartPayroll?</p>
+    </div>
+    <div class="modal-buttons">
+      <button id="confirmLogout" class="confirm-btn">Yes</button>
+      <button id="cancelLogout" class="cancel-btn">Cancel</button>
+    </div>
+  </div>
+</div>
 
 <script>
-const DAILY_RATE = 468;       // Default Daily Rate
-const MONTHLY_RATE = 12168;   // Default Basic Salary
+ // ===== LOGOUT MODAL =====
+  const logoutBtn = document.getElementById("logoutBtn");
+  const logoutModal = document.getElementById("logoutModal");
+  const confirmLogout = document.getElementById("confirmLogout");
+  const cancelLogout = document.getElementById("cancelLogout");
+
+  logoutBtn.addEventListener("click", () => logoutModal.style.display = "flex");
+  cancelLogout.addEventListener("click", () => logoutModal.style.display = "none");
+  confirmLogout.addEventListener("click", () => {
+    fetch("/logout").then(() => window.location.href = "/LOGIN.html");
+  });
+  window.addEventListener("click", e => {
+    if (e.target === logoutModal) logoutModal.style.display = "none";
+  });
+
+
+
 const WORK_HOURS = 8;
 
 function truncateTo2(num) {
@@ -98,15 +129,6 @@ window.addEventListener("DOMContentLoaded", () => {
   loadEmployees();
 });
 
-// Logout
-document.getElementById("logoutBtn").addEventListener("click", () => {
-  if (confirm("Are you sure you want to log out?")) {
-    fetch("/logout")
-      .then(() => (window.location.href = "/LOGIN.html"))
-      .catch(() => alert("Error logging out."));
-  }
-});
-
 // Load employee data
 async function loadEmployees() {
   try {
@@ -117,24 +139,30 @@ async function loadEmployees() {
     tbody.innerHTML = "";
 
     employees.forEach(emp => {
-      const tr = document.createElement("tr");
-      tr.innerHTML = `
-        <td>${emp.name}</td>
-        <td>${emp.position}</td>
-        <td>${emp.dept}</td>
-        <td>₱ <span class="basic">${emp.salary || MONTHLY_RATE}</span></td>
-        <td>₱ <span class="daily">${(emp.salary / 26 || DAILY_RATE).toFixed(2)}</span></td>
-        <td><span class="late">0.00</span></td>
-        <td><span class="undertime">0.00</span></td>
-        <td><span class="ot">0.00</span></td>
-        <td><span class="totalEarnings">0.00</span></td>
-        <td><span class="sss">0.00</span></td>
-        <td><span class="philhealth">0.00</span></td>
-        <td><span class="pagibig">0.00</span></td>
-        <td><span class="net">0.00</span></td>
-      `;
-      tbody.appendChild(tr);
-    });
+  const tr = document.createElement("tr"); // <-- this line fixes the error
+
+  const monthlySalary = emp.salary ? Number(emp.salary) : MONTHLY_RATE;
+  const dailyRateValue = monthlySalary / 26;
+
+  tr.innerHTML = `
+    <td>${emp.name}</td>
+    <td>${emp.position}</td>
+    <td>${emp.dept}</td>
+    <td>₱ <span class="basic">${monthlySalary.toFixed(2)}</span></td>
+    <td>₱ <span class="daily">${dailyRateValue.toFixed(2)}</span></td>
+    <td><span class="late">0.00</span></td>
+    <td><span class="undertime">0.00</span></td>
+    <td><span class="ot">0.00</span></td>
+    <td><span class="totalEarnings">0.00</span></td>
+    <td><span class="sss">0.00</span></td>
+    <td><span class="philhealth">0.00</span></td>
+    <td><span class="pagibig">0.00</span></td>
+    <td><span class="net">0.00</span></td>
+  `;
+
+  tbody.appendChild(tr);
+});
+
   } catch (err) {
     console.error(err);
     alert("Failed to load employees.");
@@ -182,58 +210,57 @@ document.getElementById("computeBtn").addEventListener("click", async () => {
   // Compute coverage string
   const coverage = `${startDate}_to_${endDate}`;
 
-  for (let i = 0; i < employeesData.length; i++) {
-    const emp = employeesData[i];
-    messageEl.textContent = `Computing payroll for ${emp.name}...`;
+ for (let i = 0; i < employeesData.length; i++) {
+  const emp = employeesData[i];
+  const tr = document.querySelectorAll("#payrollBody tr")[i]; 
 
-    const dtr = await fetchDTR(emp.id, coverage);
+  messageEl.textContent = `Computing payroll for ${emp.name}...`;
 
-    let totalLateMinutes = 0;
-    let totalUndertimeMinutes = 0;
-    let totalOTMinutes = 0;
-    let daysWorked = dtr.length;
+  const dtr = await fetchDTR(emp.id, coverage);
 
-    dtr.forEach(record => {
-      totalLateMinutes += record.late || 0;
-      totalUndertimeMinutes += record.undertime || 0;
-      totalOTMinutes += record.overtime || 0;
-    });
+  let totalLateMinutes = 0;
+  let totalUndertimeMinutes = 0;
+  let totalOTMinutes = 0;
+  let daysWorked = dtr.length;
 
-    const dailyRate = emp.salary ? emp.salary / 26 : DAILY_RATE;
-    const hourlyRate = dailyRate / WORK_HOURS;
-    const basicSalary = dailyRate * daysWorked;
+  dtr.forEach(record => {
+    totalLateMinutes += record.late || 0;
+    totalUndertimeMinutes += record.undertime || 0;
+    totalOTMinutes += record.overtime || 0;
+  });
 
-    const lateDeduction = hourlyRate * (totalLateMinutes / 60);
-    const undertimeDeduction = hourlyRate * (totalUndertimeMinutes / 60);
-    const otPay = (totalOTMinutes / 60) * (hourlyRate * 1.25);
+  const monthlySalary = emp.salary ? Number(emp.salary) : MONTHLY_RATE;
+  const dailyRate = monthlySalary / 26;
+  const hourlyRate = dailyRate / WORK_HOURS;
+  const basicSalary = dailyRate * daysWorked;
 
-    const totalEarnings = basicSalary + otPay - lateDeduction - undertimeDeduction;
+  const lateDeduction = hourlyRate * (totalLateMinutes / 60);
+  const undertimeDeduction = hourlyRate * (totalUndertimeMinutes / 60);
+  const otPay = (totalOTMinutes / 60) * (hourlyRate * 1.25);
 
-    // Deductions
-    const monthlySalary = emp.salary || MONTHLY_RATE;
-    const sss = 300;
-    const philhealth = monthlySalary * 0.025;
-    const pagibig = monthlySalary * 0.02;
+  const totalEarnings = basicSalary + otPay - lateDeduction - undertimeDeduction;
 
-    const netPay = totalEarnings - (sss + philhealth + pagibig);
+  const sss = 300;
+  const philhealth = monthlySalary * 0.025;
+  const pagibig = monthlySalary * 0.02;
+  const netPay = totalEarnings - (sss + philhealth + pagibig);
 
-    // Update table
-    const tr = document.querySelectorAll("#payrollBody tr")[i];
-    tr.querySelector(".late").textContent = truncateTo2(lateDeduction).toFixed(2);
-    tr.querySelector(".undertime").textContent = truncateTo2(undertimeDeduction).toFixed(2);
-    tr.querySelector(".ot").textContent = truncateTo2(otPay).toFixed(2);
-    tr.querySelector(".totalEarnings").textContent = truncateTo2(totalEarnings).toFixed(2);
-    tr.querySelector(".sss").textContent = truncateTo2(sss).toFixed(2);
-    tr.querySelector(".philhealth").textContent = truncateTo2(philhealth).toFixed(2);
-    tr.querySelector(".pagibig").textContent = truncateTo2(pagibig).toFixed(2);
-    tr.querySelector(".net").textContent = truncateTo2(netPay).toFixed(2);
+  // Update table row
+  tr.querySelector(".late").textContent = truncateTo2(lateDeduction).toFixed(2);
+  tr.querySelector(".undertime").textContent = truncateTo2(undertimeDeduction).toFixed(2);
+  tr.querySelector(".ot").textContent = truncateTo2(otPay).toFixed(2);
+  tr.querySelector(".totalEarnings").textContent = truncateTo2(totalEarnings).toFixed(2);
+  tr.querySelector(".sss").textContent = truncateTo2(sss).toFixed(2);
+  tr.querySelector(".philhealth").textContent = truncateTo2(philhealth).toFixed(2);
+  tr.querySelector(".pagibig").textContent = truncateTo2(pagibig).toFixed(2);
+  tr.querySelector(".net").textContent = truncateTo2(netPay).toFixed(2);
 
-    // ✅ Show per-employee success message
-    messageEl.textContent = `✅ Payroll computation for ${emp.name} completed!`;
-    await new Promise(res => setTimeout(res, 1500));
-  }
+  messageEl.textContent = `✅ Payroll computation for ${emp.name} completed!`;
+  await new Promise(res => setTimeout(res, 1500));
+}
 
-  // ✅ Final message
+
+  // All done
   messageEl.textContent = "✅ Payroll computation for all employees is complete!";
   closeModal.style.display = "inline-block";
   closeModal.onclick = () => (modal.style.display = "none");

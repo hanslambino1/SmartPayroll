@@ -3,10 +3,9 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>SmartPayroll</title>
+  <title>SmartPayroll | Admin Login</title>
   <link rel="icon" type="image/png" href="SPlogo.png">
   <link rel="stylesheet" href="style1.css">
-  <script src="script.js" defer></script>
 </head>
 <body>
   <!-- Header -->
@@ -26,93 +25,118 @@
   </header>
 
   <!-- Login -->
-<main class="login-container">
-  <div class="login-box">
-    <h1>Login</h1>
+  <main class="login-container">
+    <div class="login-box">
+      <h1>Admin Login</h1>
 
-    <form id="loginForm">
-  <div class="input-group">
-    <input type="text" id="username" placeholder="Username or Email" required>
-  </div>
-  <div class="input-group">
-    <input type="password" id="password" placeholder="Password" required>
-  </div>
-  <button type="submit" class="btn">Login</button>
-  <a href="#" class="forgot">Forgot Password?</a>
-</form>
+      <form id="loginForm">
+        <div class="input-group">
+          <input type="text" id="username" placeholder="Username or Email" required>
+        </div>
+        <div class="input-group">
+          <input type="password" id="password" placeholder="Password" required>
+        </div>
 
+        <!-- Error Message -->
+        <p id="error-message" style="display:none; color:red; margin-top:8px;">
+          Invalid Username or Password
+        </p>
 
-  </div>
-</main>
-</body>
+        <button type="submit" class="btn">Login</button>
+        <a href="#" class="forgot">Forgot Password?</a>
+      </form>
+    </div>
+  </main>
 
-<footer class="footer">
+  <!-- Footer -->
+  <footer class="footer">
     &copy; 2025 SmartPayroll, Inc. All rights reserved. | 
     <a href="#" onclick="openModal('privacyModal')">Privacy Policy</a> | 
     <a href="#" onclick="openModal('termsModal')">Terms of Use</a>
-</footer>
+  </footer>
 
-<!-- Privacy Modal -->
-<div id="privacyModal" class="modal">
-  <div class="modal-content">
-    <span class="close" onclick="closeModal('privacyModal')">&times;</span>
-    <h2>Privacy Policy</h2>
-    <p>
-      SmartPayroll values your privacy. This system collects and stores employee payroll
-      information for the sole purpose of managing salaries, deductions, and reports.
-      Access is restricted to authorized users (Payroll Officer and Super Admin).
-      All data is kept confidential and protected under the Data Privacy Act of 2012.
-    </p>
+  <!-- Privacy Modal -->
+  <div id="privacyModal" class="modal">
+    <div class="modal-content">
+      <span class="close" onclick="closeModal('privacyModal')">&times;</span>
+      <h2>Privacy Policy</h2>
+      <p>
+        SmartPayroll values your privacy. This system collects and stores employee payroll
+        information for the sole purpose of managing salaries, deductions, and reports.
+        Access is restricted to authorized users (Payroll Officer and Super Admin).
+        All data is kept confidential and protected under the Data Privacy Act of 2012.
+      </p>
+    </div>
   </div>
-</div>
 
-<!-- Terms Modal -->
-<div id="termsModal" class="modal">
-  <div class="modal-content">
-    <span class="close" onclick="closeModal('termsModal')">&times;</span>
-    <h2>Terms of Use</h2>
-    <p>
-      By using the SmartPayroll system, you agree to:<br>
-      1. Access is limited to authorized users only.<br>
-      2. Keep login credentials confidential.<br>
-      3. Use payroll data for official purposes only.<br>
-      4. Misuse may result in suspension or disciplinary action.
-    </p>
+  <!-- Terms Modal -->
+  <div id="termsModal" class="modal">
+    <div class="modal-content">
+      <span class="close" onclick="closeModal('termsModal')">&times;</span>
+      <h2>Terms of Use</h2>
+      <p>
+        By using the SmartPayroll system, you agree to:<br>
+        1. Access is limited to authorized users only.<br>
+        2. Keep login credentials confidential.<br>
+        3. Use payroll data for official purposes only.<br>
+        4. Misuse may result in suspension or disciplinary action.
+      </p>
+    </div>
   </div>
-</div>
 
-<script>
-document.getElementById("loginForm").addEventListener("submit", async (e) => {
-  e.preventDefault();
+  <script>
+  document.getElementById("loginForm").addEventListener("submit", async (e) => {
+    e.preventDefault();
 
-  const username = document.getElementById("username").value.trim();
-  const password = document.getElementById("password").value.trim();
+    const username = document.getElementById("username").value.trim();
+    const password = document.getElementById("password").value.trim();
+    const errorMsg = document.getElementById("error-message");
 
-  try {
-    const res = await fetch("/admin/login", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ username, password }),
-    });
-
-    const data = await res.json();
-
-    if (res.ok && data.success) {
-      localStorage.setItem("adminId", data.user.id);
-      localStorage.setItem("username", data.user.username);
-      localStorage.setItem("role", data.user.role);
-
-      // Redirect to dashboard
-      window.location.href = "DASHBOARD.html";
-    } else {
-      alert(data.message || "Login failed");
+    // Check if both fields filled
+    if (!username || !password) {
+      errorMsg.textContent = "Please enter both Username and Password.";
+      errorMsg.style.display = "block";
+      return;
     }
-  } catch (err) {
-    console.error("Login fetch error:", err);
-    alert("Something went wrong. Please try again.\n\nDetails: " + err.message);
-  }
-});
-</script>
+
+    // Password validation
+    const hasNumber = /\d/.test(password);
+    const hasSpecialChar = /[!@#$%^&*(),.?":{}|<>]/.test(password);
+    const isLongEnough = password.length >= 12;
+
+    if (!isLongEnough || !hasNumber || !hasSpecialChar) {
+      errorMsg.textContent = "Invalid Username or Password";
+      errorMsg.style.display = "block";
+      return;
+    } else {
+      errorMsg.style.display = "none";
+    }
+
+    try {
+      const res = await fetch("/admin/login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ username, password }),
+      });
+
+      const data = await res.json();
+
+      if (res.ok && data.success) {
+        localStorage.setItem("adminId", data.user.id);
+        localStorage.setItem("username", data.user.username);
+        localStorage.setItem("role", data.user.role);
+
+        window.location.href = "DASHBOARD.html";
+      } else {
+        errorMsg.textContent = "Invalid Username or Password";
+        errorMsg.style.display = "block";
+      }
+    } catch (err) {
+      console.error("Login fetch error:", err);
+      errorMsg.textContent = "Server error. Please try again later.";
+      errorMsg.style.display = "block";
+    }
+  });
+  </script>
+</body>
 </html>
-
-

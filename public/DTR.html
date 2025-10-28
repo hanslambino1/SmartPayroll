@@ -85,7 +85,42 @@
     </main>
   </div>
 
+<!-- Logout Confirmation Modal -->
+<div id="logoutModal" class="modal-logout">
+  <div class="modal-content-logout">
+    <div class="modal-header-logout">
+      <h3>Confirm Logout</h3>
+      <span class="close-btn" id="closeLogout">&times;</span>
+    </div>
+    <div class="modal-body-logout">
+      <p>Are you sure you want to log out of SmartPayroll?</p>
+    </div>
+    <div class="modal-buttons">
+      <button id="confirmLogout" class="confirm-btn">Yes</button>
+      <button id="cancelLogout" class="cancel-btn">Cancel</button>
+    </div>
+  </div>
+</div>
+
   <script>
+     // ===== LOGOUT MODAL =====
+  const logoutBtn = document.getElementById("logoutBtn");
+  const logoutModal = document.getElementById("logoutModal");
+  const confirmLogout = document.getElementById("confirmLogout");
+  const cancelLogout = document.getElementById("cancelLogout");
+
+  logoutBtn.addEventListener("click", () => logoutModal.style.display = "flex");
+  cancelLogout.addEventListener("click", () => logoutModal.style.display = "none");
+  confirmLogout.addEventListener("click", () => {
+    fetch("/logout").then(() => window.location.href = "/LOGIN.html");
+  });
+  window.addEventListener("click", e => {
+    if (e.target === logoutModal) logoutModal.style.display = "none";
+  });
+
+
+
+
 document.addEventListener("DOMContentLoaded", () => {
   const coverageSelect = document.getElementById("coverage");
   const deptSelect = document.getElementById("department");
@@ -261,15 +296,6 @@ document.addEventListener("DOMContentLoaded", () => {
         window.location.href = link.href;
       }, 500);
     });
-  });
-
-  // Logout
-  document.getElementById("logoutBtn").addEventListener("click", () => {
-    if (confirm("Are you sure you want to log out?")) {
-      fetch("/logout")
-        .then(() => window.location.href = "/LOGIN.html")
-        .catch(err => alert("Error logging out. Please try again."));
-    }
   });
 });
 
